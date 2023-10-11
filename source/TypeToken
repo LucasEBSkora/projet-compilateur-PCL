@@ -1,0 +1,7 @@
+from enum import enum
+
+#Enum
+
+class typeToken(enum):
+    access = 0
+    

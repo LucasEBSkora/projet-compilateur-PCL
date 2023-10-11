@@ -1,0 +1,44 @@
+@startuml
+Class AnalyseurLexique {
+  read(): Token
+  peek(): Token
+}
+
+class AnalyseurSyntatique {
+
+}
+
+class Token {
+  ligne: int 
+  positionLigne: int
+  lexeme: String
+  type: TypeToken
+  toString() : String
+}
+
+Enum TypeToken {
+  identifiant
+  entier
+  caractere
+  EQ
+  NE
+  ...
+  access
+  and
+  begin
+  else
+  elsif
+  end
+  ...
+}
+
+abstract class Noeud {
+
+}
+
+AnalyseurSyntatique --> AnalyseurLexique
+AnalyseurSyntatique ..> Token
+Noeud ..> AnalyseurSyntatique : "généré par"
+Token "1" *-- "1" TypeToken
+Token ..> AnalyseurLexique : "généré par"
+@enduml

@@ -32,4 +32,18 @@ class typeToken(Enum):
     USE = 26
     WHILE = 27
     WITH = 28
-
+    EQ = 29 # =
+    NE = 30 # /=
+    LT = 31 # < 
+    LE = 32 # <=
+    GE = 33 # >= 
+    GT = 34 # >
+    MINUS = 35 # -
+    PLUS = 36 # +
+    MUL = 37 # *
+    DIV = 37 # /
+    POINT = 38 # . (accès) 
+    AFFECT = 39 # :=
+    ENTIERE = 40
+    CARACTERE = 41
+    IDENTIFICATEUR = 42

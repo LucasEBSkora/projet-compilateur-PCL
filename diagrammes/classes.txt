@@ -4,8 +4,16 @@ Class AnalyseurLexique {
   peek(): Token
 }
 
-class AnalyseurSyntatique {
+class AnalyseurFichier {
+  fichier(): Noeud
+}
 
+class AnalyseurInstr {
+  instr(): Noeud
+}
+
+class AnalyseurExpr {
+  expr(): Noeud
 }
 
 class Token {
@@ -36,9 +44,16 @@ abstract class Noeud {
 
 }
 
-AnalyseurSyntatique --> AnalyseurLexique
-AnalyseurSyntatique ..> Token
-Noeud ..> AnalyseurSyntatique : "généré par"
+AnalyseurFichier --> AnalyseurLexique
+AnalyseurFichier --> AnalyseurInstr
+AnalyseurFichier --> AnalyseurExpr
+
+AnalyseurInstr --> AnalyseurExpr
+
+AnalyseurFichier ..> Token
+Noeud ..> AnalyseurFichier : "généré par"
+Noeud ..> AnalyseurInstr : "généré par"
+Noeud ..> AnalyseurExpr : "généré par"
 Token "1" *-- "1" TypeToken
 Token ..> AnalyseurLexique : "généré par"
 @enduml

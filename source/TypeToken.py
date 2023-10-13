@@ -1,8 +1,8 @@
-from enum import enum
+from enum import Enum
 
 #Enum
 
-class typeToken(enum):
+class typeToken(Enum):
     ACCESS = 0
     AND = 1
     BEGIN = 2

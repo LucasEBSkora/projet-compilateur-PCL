@@ -27,15 +27,21 @@
                 loop <instr>+ end loop ;
               | while <expr> loop <instr>+ end loop ;
 
-
-<expr>       ::= <entier> | <caractere> | true | false | null
-              | ( <expr> )
-              | <accès>
-              |  <expr> <opérateur> <expr>
-              |  not <expr>  | - <expr>
-              | new <ident>
-              | <ident> ( <expr>+, )
-              | character'val(<expr>)
-<opérateur>  ::= = | /= | < | <= | > | >= | + | - | * | / | rem
-              | and | and then | or | or else
-<accès>      ::= <ident> | <expr> . <ident>
+<expr> ::= <and> ((or  | or else) <expr>)?
+<and> ::= <not> ((and | and then) <and>)?
+<not> ::= not <not>
+      |  <egal>
+<egal> ::= <comparaison> (( = | \=) <comparaison>)?
+<comparaison> ::= <addition> (( > |  >= | < | <=) <addition>)?
+<addition> ::= <multiplication> ((+ | -) <addition>)?
+<multiplication> ::= <negation> ((* | \ | rem) <multiplication>)?
+<negation> ::= - <negation>
+      |  <acces>
+<accès>      ::= <primaire> <acces_ou_appel>
+<acces_embriqué> ::= "" (vide)
+                  | . <expr> <acces_embriqué>
+<primaire>       ::= <entier> | <caractere> | true | false | null
+                  | ( <expr> )
+                  | new <ident>
+                  | <ident> ( <expr>+, )
+                  | character'val(<expr>)

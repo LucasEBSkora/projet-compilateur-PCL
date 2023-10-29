@@ -165,7 +165,7 @@ class AnalyseurFichier:
                 return None
         self.lexeur.next()
         self.check_token(typeToken.SEMICOLON)
-        return noeud.Fonction(identificateur,params,typage,instr,decl)
+        return noeud.Function(identificateur,params,typage,instr,decl)
     
         
 

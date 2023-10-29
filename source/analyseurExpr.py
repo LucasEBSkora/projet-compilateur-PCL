@@ -1,6 +1,6 @@
 import noeud
 from TypeToken import typeToken
-
+#parser expr
 class AnalyseurExpr:
   def __init__(self, analyseurLexique):
     self.lexeur = analyseurLexique
@@ -38,6 +38,8 @@ class AnalyseurExpr:
       self.lexeur.next()
       operande = self._not()
       return noeud.Unaire("not", operande)
+    
+    #ce n'est pas plutot noeud.Not("not",operande)
     return self._egal()
 
   def _egal(self):

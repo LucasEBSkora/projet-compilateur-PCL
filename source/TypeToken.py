@@ -47,3 +47,11 @@ class typeToken(Enum):
     ENTIER = 40
     CARACTERE = 41
     IDENTIFICATEUR = 42
+    ADA = 43
+    SEMICOLON = 44
+    EOF = 45
+    COMMA = 46
+    COLON = 47
+    ASSIGN = 48
+    OPEN = 49
+    CLOSE = 50

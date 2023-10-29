@@ -29,6 +29,14 @@ mots_cles = {"access":    typeToken.ACCESS,
              "type":      typeToken.TYPE,
              "use":       typeToken.USE,
              "while":     typeToken.WHILE,
-             "with":      typeToken.WITH
+             "with":      typeToken.WITH,
+             "Ada.Text_IO" : typeToken.ADA,
+             ";" : typeToken.SEMICOLON,
+             "EOF" : typeToken.EOF,
+             "," : typeToken.COMMA,
+             ":" : typeToken.COLON,
+             ":=" : typeToken.ASSIGN,
+             "(" : typeToken.OPEN,
+             ")" : typeToken.CLOSE
             }
 

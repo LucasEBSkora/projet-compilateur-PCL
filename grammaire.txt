@@ -6,8 +6,9 @@
               | type <ident> is record <champs>+ end record ;
               | <ident>+, : <type> (:= <expr>)? ; 
               | procedure <ident> <params>? is <decl>*
-              | begin <instr>+ end <ident>?;
+                begin <instr>+ end <ident>?;
               | function <ident> <params>? return <type> is <decl>*
+                begin <instr>+ end <ident>?;
 <champs>     ::= <ident>+, : <type>; 
 <type>       ::= <ident>
               | access <ident>

@@ -44,6 +44,6 @@ class typeToken(Enum):
     DIV = 37 # /
     POINT = 38 # . (accès) 
     AFFECT = 39 # :=
-    ENTIERE = 40
+    ENTIER = 40
     CARACTERE = 41
     IDENTIFICATEUR = 42

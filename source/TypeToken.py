@@ -55,3 +55,6 @@ class typeToken(Enum):
     ASSIGN = 48
     OPEN = 49
     CLOSE = 50
+    CHARACTER_APOSTROFE_VAL = 51 #character'val
+    PARENG = 52 #(
+    PAREND = 53 #)

@@ -8,10 +8,10 @@ class AnalyseurExpr:
   def expr(self):
     gauche = self._and()
 
-    if self.lexeur.peek().type == typeToken.OR:
+    if self._prochainTokenEst(typeToken.OR):
       labelNoeud = "or"
       self.lexeur.next()
-      if self.lexeur.peek().type == typeToken.ELSE:
+      if self._prochainTokenEst(typeToken.ELSE):
         labelNoeud = "or else"
         self.lexeur.next()
       droite = self.expr()
@@ -22,10 +22,10 @@ class AnalyseurExpr:
   def _and(self):
     gauche = self._not()
 
-    if self.lexeur.peek().type == typeToken.AND:
+    if self._prochainTokenEst(typeToken.AND):
       labelNoeud = "and"
       self.lexeur.next()
-      if self.lexeur.peek().type == typeToken.THEN:
+      if self._prochainTokenEst(typeToken.THEN):
         labelNoeud = "and then"
         self.lexeur.next()
       droite = self._and()
@@ -34,35 +34,149 @@ class AnalyseurExpr:
     return gauche
 
   def _not(self):
-    if self.lexeur.peek().type == typeToken.NOT:
+    if self._prochainTokenEst(typeToken.NOT):
       self.lexeur.next()
       operande = self._not()
       return noeud.Unaire("not", operande)
     
-    #ce n'est pas plutot noeud.Not("not",operande)
     return self._egal()
 
   def _egal(self):
-    None
+    gauche = self._comparaison()
+
+    if self._prochainTokenDans([typeToken.NE, typeToken.EQ]):
+        label = self.lexeur.next().value
+        droite = self._comparaison()
+        return noeud.Binaire(gauche, label, droite)
+    return gauche
 
   def _comparaison(self):
-    None
+    gauche = self._addition()
+
+    if  self._prochainTokenDans([typeToken.GE, typeToken.GT, 
+                                       typeToken.LE, typeToken.LT]):
+        label = self.lexeur.next().value
+        droite = self._addition()
+        return noeud.Binaire(gauche, label, droite)
+    return gauche
 
   def _addition(self):
-    None
+    gauche = self._multiplication()
+
+    if self._prochainTokenDans([typeToken.PLUS, typeToken.MINUS]):
+      label = self.lexeur.next().value
+      droite = self._addition()
+      return noeud.Binaire(gauche, label, droite)
+    return gauche
 
   def _multiplication(self):
-    None
+    gauche = self._negation()
+
+    if self._prochainTokenDans([typeToken.MUL, typeToken.DIV, typeToken.REM]):
+      label = self.lexeur.next().value
+      droite = self._multiplication()
+      return noeud.Binaire(gauche, label, droite)
+    return gauche
 
   def _negation(self):
-    None
+    if self._prochainTokenEst(typeToken.MINUS):
+      self.lexeur.next()
+      operande = self._negation()
+      return noeud.Unaire("-", operande)
+    
+    return self.acces()
 
   def acces(self):
-    None
+    expr = self._primaire()
 
-  def _acces_embrique(self):
-    None
+    while self._prochainTokenEst(typeToken.POINT):
+      self.lexeur.next()
+
+      id = self.lexeur.next()
+      if not self._prochainTokenEst(typeToken.IDENTIFICATEUR):
+        print(f"expected identifier after . at {id.position}, got {id.value} instead")
+
+      expr = noeud.Access(expr, id)
+
+    return expr
 
   def _primaire(self):
-    None
+    literal = self._essayerLiteral()
+    if not literal is None:
+      return literal
+    
+    exprParenthese = self._essayerParenthese()
+    if not exprParenthese is None:
+      return exprParenthese
+    
+    newExpr = self._essayerNew()
+    if not newExpr is None:
+      return newExpr
+    
+    character_val = self._essayerCharacterVal()
+    if not character_val is None:
+      return character_val
+    
+    return self.appel()
+    
+  def _essayerLiteral(self):
+    if self._prochainTokenDans([typeToken.ENTIER, typeToken.CARACTERE, typeToken.TRUE, typeToken.FALSE, typeToken.NULL]):
+      self.lexeur.next()
+      return noeud.Literal(self.lexeur.next())
+    return None
+  
+  def _essayerParenthese(self):
+    if not self._prochainTokenEst(typeToken.PARENG):
+      return None
+    self.lexeur.next()
+    expr = self.expr()
+    if not self._prochainTokenEst(typeToken.PAREND):
+      faux_token = self.lexeur.next()
+      print(f"expected ')' at ${faux_token.position}, got {faux_token.value} instead")
+      exit(1)
+    self.lexeur.next()
+    return expr
+  
+  def _essayerNew(self):
+    if not self._prochainTokenEst(typeToken.NEW):
+      return None
+    id = self.lexeur.next()
+    if id.type != typeToken.IDENTIFICATEUR:
+      print(f"expected new identifier at ${id.position}, got {id.value} instead")
+      exit(1)
+    return id
+    
+  def _essayerCharacterVal(self):
+    if not self._prochainTokenEst(typeToken.CHARACTER_APOSTROFE_VAL):
+      return None
+    self.lexeur.next()
 
+    expr = self.expr()
+    return noeud.CharacterApostrofeVal(expr)
+  
+  def appel(self, id):
+    id = self.lexeur.peek()
+    if id.type != typeToken.IDENTIFICATEUR:
+      print(f"unexpected '{id.value}' at {id.position}")
+
+    if not self._prochainTokenEst(typeToken.PARENG):
+      return id
+  
+    self.lexeur.next()
+    params = []
+    while not self._prochainTokenEst(typeToken.PAREND):
+      params.append(self.expr())
+      if self._prochainTokenEst(typeToken.COMMA):
+        self.lexeur.next()
+      elif not self._prochainTokenEst(typeToken.PAREND):
+        token = self.lexeur.next()
+        print(f"expected ')' or ',' after call parameter, got {token.value} instead")
+        exit(1)
+    self.lexeur.next()
+    return noeud.Appel(id, params)
+    
+  def _prochainTokenEst(self, type):
+    return self.lexeur.peek().type == type
+
+  def _prochainTokenDans(self, types):
+    return self.lexeur.peek().type in types

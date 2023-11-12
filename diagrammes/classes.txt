@@ -15,6 +15,7 @@ class AnalyseurInstr {
 class AnalyseurExpr {
   expr(): Noeud
   acces(): Noeud
+  appel(): Noeud
 }
 
 class Token {

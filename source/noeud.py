@@ -15,6 +15,19 @@ class Unaire:
     self.operateur = operateur
     self.operande = operande
 
+class Literal:
+  def __init(self, literal):
+    self.literal = literal
+
+class CharacterApostrofeVal:
+  def __init(self, expr):
+    self.expr = expr
+
+class Appel:
+  def __init__(self, ident, params):
+    self.ident = ident
+    self.params = params
+
 
 class Var:
   def __init__(self,ident,type,expr):

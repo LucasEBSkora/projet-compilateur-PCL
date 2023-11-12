@@ -40,3 +40,10 @@ mots_cles = {"access":    typeToken.ACCESS,
              ")" : typeToken.CLOSE
             }
 
+class Token:
+    def __init__(self, token_type, value, position):
+        self.token_type = token_type
+        self.value = value
+        self.position = position
+
+

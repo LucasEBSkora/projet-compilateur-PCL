@@ -15,14 +15,14 @@ def lexer(source_code):
     while position < len(source_code):
         avancement = position
         lecture = ""
-        #On teste d'abord si token
+        #On teste d'abord si c'est un token
         for keyword in mots_cles:
             if source_code.startswith(keyword, position) and source_code[position + len(keyword)] not in ident:
                 tokens.append(Token(mots_cles[keyword], keyword, position))
                 pastoken.append()
                 position += len(keyword)
                 break
-        #C'est peut-être un identificateur
+        #Sinon c'est peut-être un identificateur
         match = identificateur_pattern.match(source_code, position)
         if match:
             identificateur = match.group()

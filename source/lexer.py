@@ -1,4 +1,4 @@
-from TypeToken import mots_cles, typeToken
+from TypeToken import typeToken
 from token import mots_cles, Token 
 import re
 
@@ -19,7 +19,7 @@ def lexer(source_code):
         for keyword in mots_cles:
             if source_code.startswith(keyword, position) and source_code[position + len(keyword)] not in ident:
                 tokens.append(Token(mots_cles[keyword], keyword, position))
-                pastoken.append()
+                pastoken.append(keyword)
                 position += len(keyword)
                 break
         #Sinon c'est peut-être un identificateur
@@ -49,4 +49,11 @@ def lexer(source_code):
         elif source_code[position:position+1] == "--":
             while source_code[position] != "\n":
                 position += 1
+        elif source_code[position] == '\n':
+            position += 1
+        else:
+            for token in tokens:
+                print(token.token_type)
+            print(f"caractere unconnu {source_code[position]} a {position}")
+            exit(1)
     return tokens,pastoken

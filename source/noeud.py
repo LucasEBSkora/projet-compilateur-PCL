@@ -76,3 +76,33 @@ class Param:
     self.mode = mode
     self.type = type
 
+class Return:
+  def __init__(self, expr):
+    self.expr = expr
+
+class Begin:
+  def __init__(self, instr):
+    self.instr = instr
+
+class Loop:
+  def __init__(self, instr):
+    self.instr = instr
+
+class WhileLoop:
+  def __init__(self,expr, instrList):
+    self.expr = expr
+    self.instrList = instrList
+
+class ForLoop:
+  def __init__(self, expr1, expr2, instrList):
+    self.expr1 = expr1
+    self.expr2 = expr2
+    self.instrList = instrList
+
+class If:
+  def __init__(self, expr1, instrList1, expr2, listTuple, instrList3):
+    self.expr1 = expr1
+    self.instrList1 = instrList1
+    self.expr2 = expr2
+    self.listTuple = listTuple
+    self.instrList3 = instrList3

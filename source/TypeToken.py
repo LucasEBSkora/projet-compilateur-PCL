@@ -58,3 +58,4 @@ class typeToken(Enum):
     CHARACTER_APOSTROFE_VAL = 51 #character'val
     PARENG = 52 #(
     PAREND = 53 #)
+    DEUXPOINTS = 54 #..

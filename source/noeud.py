@@ -34,7 +34,7 @@ class Ident:
 
 
 class CharacterApostrofeVal:
-  def __init(self, expr):
+  def __init__(self, expr):
     self.expr = expr
   def __str__(self):
     return f"character'val({self.expr})"
@@ -52,12 +52,20 @@ class Var:
     self.type = type
     self.ident = ident
     self.expr = expr
+  
+  def __str__(self):
+    return f'Var({self.type}, {self.ident},{self.expr})'
+  
 class Procedure:
   def __init__(self,ident,params,instr,decl):
     self.ident = ident
     self.params = params
     self.instr = instr
     self.decl = decl
+  
+  def __str__(self):
+    return f'Procedure({self.ident}, {self.params},{self.instr},{self.decl})'
+
 class Function:
   def __init__(self,ident,params,type,instr,decl):
     self.ident = ident
@@ -65,28 +73,49 @@ class Function:
     self.type = type
     self.instr = instr
     self.decl = decl 
+  
+  def __str__(self):
+    return f'Function({self.ident}, {self.params},{self.type},{self.instr},{self.decl})'
+
 class Record:
   def __init__(self,ident,champs):
     self.ident = ident
     self.champs = champs
+
+  def __str__(self):
+    return f'Record({self.ident}, {self.champs})'
+
 class Access:
   def __init__(self,ident1,ident2):
     self.ident1 = ident1
     self.ident2 = ident2
 
+  def __str__(self):
+    return f'Access({self.indent1}, {self.ident2})'
+
 class Type:
   def __init__(self,isAccess,ident):
     self.ident = ident
     self.isAccess = isAccess
+  
+  def __str__(self):
+    return f'Type({self.ident}, {self.isAccess})'
 
 class Champs: 
   def __init__(self,ident,type):
     self.ident = ident
     self.type = type
+  
+  def __str__(self):
+    return f'Champs({self.ident}, {self.type})'
 
 class Mode:
   def __init__(self,isIn):
     self.isIn = isIn
+
+  
+  def __str__(self):
+    return f'Mode({self.isIn})'
 
 class Param:
   def __init__(self,ident,mode,type):
@@ -94,6 +123,9 @@ class Param:
     self.mode = mode
     self.type = type
 
+  def __str__(self):
+    return f'record({self.ident}, {self.mode},{self.type})'
+  
 class Return:
   def __init__(self, expr):
     self.expr = expr
@@ -118,9 +150,13 @@ class ForLoop:
     self.instrList = instrList
 
 class If:
-  def __init__(self, expr1, instrList1, expr2, listTuple, instrList3):
+  def __init__(self, expr1, instrList1, listTuple, instrList3):
     self.expr1 = expr1
     self.instrList1 = instrList1
-    self.expr2 = expr2
     self.listTuple = listTuple
     self.instrList3 = instrList3
+
+class Affectation:
+  def __init__(self, acess, expr):
+    self.acess = acess
+    self.expr = expr

@@ -58,7 +58,7 @@ class AnalyseurInstr:
                 self.verification(typeToken.END)
                 self.verification(typeToken.IF)
                 self.verification(typeToken.SEMICOLON)
-            return noeud.If(x, instrList2, y, listTuples, instrList4)
+            return noeud.If(x, instrList2, listTuples, instrList4)
 
         # | for <ident> in reverse? <expr> .. <expr>
         #   loop <instr>+ end loop ;
@@ -92,9 +92,28 @@ class AnalyseurInstr:
             self.verification(typeToken.LOOP)
             self.verification(typeToken.SEMICOLON)
             return noeud.WhileLoop(g, instrList6)
+        
 
 
+        k = AnalyseurExpr.acces()
 
+        # <accès> := <expr>;
+        if(k is noeud.Binaire and k.operateur == "."):
+            self.verification(typeToken.AFFECT)
+            p = AnalyseurExpr.expr()
+            self.verification(typeToken.SEMICOLON)
+            return noeud.Affectation(k,p)
+        elif(k is noeud.Appel): # <appel> ;
+            self.verification(typeToken.SEMICOLON)
+            return k
+        elif(k is noeud.Ident):
+            if(self.prochainToken(typeToken.SEMICOLON)): # ident ;
+                return k
+            else:  # ident := <expr>;
+                self.verification(typeToken.AFFECT)
+                q = AnalyseurExpr.expr()
+                self.verification(typeToken.SEMICOLON)
+                return  noeud.Affectation(k ,q)
 
     def repetitionInstr(self, *args):
         list = []

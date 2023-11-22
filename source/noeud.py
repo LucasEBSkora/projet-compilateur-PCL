@@ -106,3 +106,8 @@ class If:
     self.expr2 = expr2
     self.listTuple = listTuple
     self.instrList3 = instrList3
+
+class Affectation:
+  def __init__(self, acess, expr):
+    self.acess = acess
+    self.expr = expr

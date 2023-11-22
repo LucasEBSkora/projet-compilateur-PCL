@@ -10,24 +10,42 @@ class Binaire:
     self.operateur = operateur
     self.droite = droite
 
+  def __str__(self):
+    return f"{self.operateur}({self.gauche}, {self.droite})"
+
 class Unaire:
   def __init__(self, operateur, operande):
     self.operateur = operateur
     self.operande = operande
+  def __str__(self):
+    return f"{self.operateur}({self.operande})"
 
 class Literal:
-  def __init(self, literal):
+  def __init__(self, literal):
     self.literal = literal
+  def __str__(self):
+    return str(self.literal)
+
+class Ident:
+  def __init__(self, nom):
+    self.nom = nom
+  def __str__(self):
+    return str(self.nom)
+
 
 class CharacterApostrofeVal:
   def __init(self, expr):
     self.expr = expr
+  def __str__(self):
+    return f"character'val({self.expr})"
 
 class Appel:
   def __init__(self, ident, params):
     self.ident = ident
     self.params = params
 
+  def __str__(self):
+    return f"{self.ident}({self.params})"
 
 class Var:
   def __init__(self,ident,type,expr):

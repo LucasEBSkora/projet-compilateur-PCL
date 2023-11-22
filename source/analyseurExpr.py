@@ -121,7 +121,7 @@ class AnalyseurExpr:
     
   def _essayerLiteral(self):
     if self._prochainTokenDans([typeToken.ENTIER, typeToken.CARACTERE, typeToken.TRUE, typeToken.FALSE, typeToken.NULL]):
-      return noeud.Literal(self.lexeur.next())
+      return noeud.Literal(self.lexeur.next().value)
     return None
   
   def _essayerParenthese(self):
@@ -153,14 +153,14 @@ class AnalyseurExpr:
     expr = self.expr()
     return noeud.CharacterApostrofeVal(expr)
   
-  def appel(self, id):
+  def appel(self):
     id = self.lexeur.peek()
     if id.type != typeToken.IDENTIFICATEUR:
       print(f"unexpected '{id.value}' at {id.position}")
       exit(1)
 
     if not self._prochainTokenEst(typeToken.PARENG):
-      return id
+      return noeud.Ident(id.value)
   
     self.lexeur.next()
     params = []

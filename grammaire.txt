@@ -1,20 +1,25 @@
 <fichier>    ::= with Ada.Text_IO; use Ada.Text_IO ;
               procedure <ident> is <decl>*
               begin <instr>+ end <ident>? ; EOF
-<decl>       ::= type <ident>;
-              | type <ident> is access <ident> ;
-              | type <ident> is record <champs>+ end record ;
+<decl>       ::= type <ident> <_type>;
               | <ident>+, : <type> (:= <expr>)? ; 
               | procedure <ident> <params>? is <decl>*
                 begin <instr>+ end <ident>?;
               | function <ident> <params>? return <type> is <decl>*
                 begin <instr>+ end <ident>?;
+
+<_type>      ::= ε 
+              | is <access_ou_record>
+              
+<access_ou_record> ::= access <ident> 
+                    | record <champs>+ end record 
 <champs>     ::= <ident>+, : <type>; 
 <type>       ::= <ident>
               | access <ident>
 <params>     ::= (<param>+;)
 <param>      ::= <ident>+, : <mode>? <type>
-<mode>       ::= in | in out
+<mode>       ::= in <_mode>
+<_mode>      ::= ε | out
 
 
 <instr>      ::= <accès> := <expr>;
@@ -27,8 +32,12 @@
                 loop <instr>+ end loop ;
               | while <expr> loop <instr>+ end loop ;
 
-<expr> ::= <and> ((or  | or else) <expr>)?
-<and> ::= <not> ((and | and then) <and>)?
+<expr> ::= <and> (or <_else> <expr>)?
+<_else> ::= ε
+            | else
+<and> ::= <not> ((and <_then>) <and>)?
+<_then> ::= ε
+            | then
 <not> ::= not <not>
       |  <egal>
 <egal> ::= <comparaison> (( = | \=) <comparaison>)?
@@ -36,14 +45,17 @@
 <addition> ::= <multiplication> ((+ | -) <addition>)?
 <multiplication> ::= <negation> ((* | \ | rem) <multiplication>)?
 <negation> ::= - <negation>
-            |  <accès_ou_appel>
-<accès>      ::= <primaire> 
-              | <primaire> . <ident>
+            |  <accès>
+<accès>      ::= <primaire> <_accès>
+<_accès>     ::=  ε
+              | . <ident>
 <primaire>       ::= <entier> | <caractere> | true | false | null
                   | ( <expr> )
                   | new <ident>
                   | character'val(<expr>)
                   | <appel>
 
-<appel> ::= <ident>
-          | <ident> ( <expr>+, )
+<appel> ::= <ident> <_appel>
+
+<_appel> ::= ε
+            | ( <expr>+, )

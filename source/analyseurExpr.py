@@ -102,26 +102,25 @@ class AnalyseurExpr:
 
   def _primaire(self):
     literal = self._essayerLiteral()
-    if not literal is None:
+    if not (literal is None):
       return literal
     
     exprParenthese = self._essayerParenthese()
-    if not exprParenthese is None:
+    if not (exprParenthese is None):
       return exprParenthese
     
     newExpr = self._essayerNew()
-    if not newExpr is None:
+    if not (newExpr is None):
       return newExpr
     
     character_val = self._essayerCharacterVal()
-    if not character_val is None:
+    if not (character_val is None):
       return character_val
     
     return self.appel()
     
   def _essayerLiteral(self):
     if self._prochainTokenDans([typeToken.ENTIER, typeToken.CARACTERE, typeToken.TRUE, typeToken.FALSE, typeToken.NULL]):
-      self.lexeur.next()
       return noeud.Literal(self.lexeur.next())
     return None
   
@@ -158,6 +157,7 @@ class AnalyseurExpr:
     id = self.lexeur.peek()
     if id.type != typeToken.IDENTIFICATEUR:
       print(f"unexpected '{id.value}' at {id.position}")
+      exit(1)
 
     if not self._prochainTokenEst(typeToken.PARENG):
       return id

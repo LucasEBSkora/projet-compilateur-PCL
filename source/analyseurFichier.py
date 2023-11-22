@@ -4,8 +4,10 @@ from TypeToken import typeToken
 #parser fichier
 class AnalyseurFichier:
     
-    def __init__(self, analyseurLexique):
+    def __init__(self, analyseurLexique,analyseurInstr, analyseurExpr):
         self.lexeur = analyseurLexique
+        self.analyseurInstr = analyseurInstr
+        self.analyseurExpr = analyseurExpr
 
     def fichier(self):
         tokens = [typeToken.WITH, typeToken.ADA, typeToken.SEMICOLON, typeToken.USE, typeToken.ADA, typeToken.SEMICOLON, typeToken.PROCEDURE]
@@ -16,7 +18,7 @@ class AnalyseurFichier:
         self.check_token(typeToken.IS)
         decl = self.decl()
         self.check_token(typeToken.BEGIN)
-        instr = self.instr() #pas a moi de faire, TODO peut être appeler en mode self.AnalyseurInstr.instr() 
+        instr = self.analyseurInstr.instr()
         self.check_token(typeToken.END)
         if self.lexeur.peek().type == typeToken.IDENTIFICATEUR:
             if identificateur != self.lexeur.peek().value:
@@ -115,7 +117,7 @@ class AnalyseurFichier:
         typage = self.typage()
         if self.lexeur.peek().type == typeToken.ASSIGN:
             self.check_token(typeToken.ASSIGN)
-            expr = analyseurExpr.expr()
+            expr = self.analyseurExpr.expr()
         self.check_token(typeToken.SEMICOLON)
         return noeud.Var(idents,typage,expr)
 
@@ -138,7 +140,7 @@ class AnalyseurFichier:
         self.check_token(typeToken.IS)
         decl = self.decl()
         self.check_token(typeToken.BEGIN)
-        instr = self.instr()
+        instr = self.analyseurInstr.instr()
         self.check_token(typeToken.END)
         if self.lexeur.peek().type == typeToken.IDENTIFICATEUR:
             if identificateur != self.lexeur.peek().value: 
@@ -158,7 +160,7 @@ class AnalyseurFichier:
         self.check_token(typeToken.IS)
         decl = self.decl()
         self.check_token(typeToken.BEGIN)
-        instr = self.instr()
+        instr = self.analyseurInstr.instr()
         self.check_token(typeToken.END)
         if self.lexeur.peek().type == typeToken.IDENTIFICATEUR:
             if identificateur != self.lexeur.peek().value: 

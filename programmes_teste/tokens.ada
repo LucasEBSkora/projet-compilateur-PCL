@@ -1,12 +1,5 @@
-access
-and
-begin
-else
-ifelse
-end
-false
-for
-function
+access and begin else if else
+end false for function
 in
 is
 loop

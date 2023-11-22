@@ -58,7 +58,7 @@ class AnalyseurInstr:
                 self.verification(typeToken.END)
                 self.verification(typeToken.IF)
                 self.verification(typeToken.SEMICOLON)
-            return noeud.If(x, instrList2, y, listTuples, instrList4)
+            return noeud.If(x, instrList2, listTuples, instrList4)
 
         # | for <ident> in reverse? <expr> .. <expr>
         #   loop <instr>+ end loop ;

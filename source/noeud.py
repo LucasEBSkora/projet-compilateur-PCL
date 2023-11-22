@@ -135,10 +135,9 @@ class ForLoop:
     self.instrList = instrList
 
 class If:
-  def __init__(self, expr1, instrList1, expr2, listTuple, instrList3):
+  def __init__(self, expr1, instrList1, listTuple, instrList3):
     self.expr1 = expr1
     self.instrList1 = instrList1
-    self.expr2 = expr2
     self.listTuple = listTuple
     self.instrList3 = instrList3
 

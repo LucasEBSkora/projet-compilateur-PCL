@@ -17,7 +17,7 @@ class AnalyseurInstr:
             self.lexeur.next()
             if (self.verification(typeToken.SEMICOLON)):
                 return noeud.Return(None)
-            acces = AnalyseurExpr.acces()
+            acces = AnalyseurExpr.expr()
             self.verification(typeToken.SEMICOLON)
             return noeud.Return(acces)
         

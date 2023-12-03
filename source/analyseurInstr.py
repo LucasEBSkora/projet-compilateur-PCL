@@ -40,14 +40,14 @@ class AnalyseurInstr:
             instrList4 = []
             listTuples = []
             self.lexeur.next()
-            x = AnalyseurExpr.expr()
+            x = self.analyseurExpr.expr()
             self.verification(typeToken.THEN)
             instrList2 = self.repetitionInstr(typeToken.ELSEIF, typeToken.ELSE, typeToken.END)
             if(self.prochainToken(typeToken.ELSEIF)):
                 while(self.prochainToken(typeToken.ELSEIF)):
                     instrList3.clear()
                     self.lexeur.next()
-                    y = AnalyseurExpr.expr()
+                    y = self.analyseurExpr.expr()
                     self.verification(typeToken.THEN)
                     instrList3 = self.repetitionInstr(typeToken.ELSE, typeToken.END, typeToken.ELSEIF)
                     listTuples.append((y, instrList3))
@@ -71,9 +71,9 @@ class AnalyseurInstr:
             if(self.prochainToken(typeToken.REVERSE)):
                 pass
             self.lexeur.next()
-            x = AnalyseurExpr.expr()
+            x = self.analyseurExpr.expr()
             self.verification(typeToken.DEUXPOINTS)
-            y = AnalyseurExpr.expr()
+            y = self.analyseurExpr.expr()
             self.verification(typeToken.LOOP)
             instrList5 = self.repetitionInstr(typeToken.END)
             self.verification(typeToken.END)
@@ -86,7 +86,7 @@ class AnalyseurInstr:
         if(self.prochainToken(typeToken.WHILE)):
             instrList6 = []
             self.lexeur.next()
-            g = AnalyseurExpr.expr()
+            g = self.analyseurExpr.expr()
             self.verification(typeToken.LOOP)
             instrList6 = self.repetitionInstr(typeToken.END)
             self.verification(typeToken.END)
@@ -96,12 +96,12 @@ class AnalyseurInstr:
         
 
 
-        k = AnalyseurExpr.acces()
+        k = self.analyseurExpr.acces()
 
         # <accès> := <expr>;
         if(k is noeud.Binaire and k.operateur == "."):
             self.verification(typeToken.AFFECT)
-            p = AnalyseurExpr.expr()
+            p = self.analyseurExpr.expr()
             self.verification(typeToken.SEMICOLON)
             return noeud.Affectation(k,p)
         elif(k is noeud.Appel): # <appel> ;
@@ -112,7 +112,7 @@ class AnalyseurInstr:
                 return k
             else:  # ident := <expr>;
                 self.verification(typeToken.AFFECT)
-                q = AnalyseurExpr.expr()
+                q = self.analyseurExpr.expr()
                 self.verification(typeToken.SEMICOLON)
                 return  noeud.Affectation(k ,q)
 

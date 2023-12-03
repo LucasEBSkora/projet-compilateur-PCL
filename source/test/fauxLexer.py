@@ -4,7 +4,9 @@ incluire_parent()
 
 from Token import Token
 from TypeToken import typeToken
+
 class FauxLexer:
+    
   def __init__(self, tokens):
     self.tokens = tokens
     self.indice = 0
@@ -16,3 +18,7 @@ class FauxLexer:
       valeur = self.peek()
       self.indice += 1
       return valeur
+  def builder(tokens):
+    def toToken(element):
+      return Token(element[0], element[1], 0, 0)
+    return FauxLexer(list(map(toToken, tokens)))

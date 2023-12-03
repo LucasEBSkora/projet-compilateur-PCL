@@ -13,7 +13,7 @@ from ExceptionSyntatique import ExceptionSyntatique
 class TestAnalyseurExpr(unittest.TestCase):
 
   def test_appelSansIdentifier(self):
-    lexer = FauxLexer([Token(typeToken.ENTIER, "1", 0, 0)]) 
+    lexer = FauxLexer.builder([(typeToken.ENTIER, "1")])
     analyseur = AnalyseurExpr(lexer)
     try:
       analyseur.appel()
@@ -23,14 +23,14 @@ class TestAnalyseurExpr(unittest.TestCase):
     self.assertTrue(False)
 
   def test_appelRetourneIdent(self):
-    lexer = FauxLexer([Token(typeToken.IDENTIFICATEUR, "a", 0, 0), Token(typeToken.PLUS, "+", 0, 1)]) 
+    lexer = FauxLexer.builder([(typeToken.IDENTIFICATEUR, "a"), (typeToken.PLUS, "+")]) 
     analyseur = AnalyseurExpr(lexer)
     expr =  analyseur.appel()
     self.assertIsInstance(expr, noeud.Ident)
     self.assertEqual("a", expr.nom)
   
   def test_appelSansParentheseDroite(self):
-    lexer = FauxLexer([Token(typeToken.IDENTIFICATEUR, "a", 0, 0), Token(typeToken.PARENG, "+", 0, 1), Token(typeToken.CARACTERE, "'a'", 0, 2)]) 
+    lexer = FauxLexer.builder([(typeToken.IDENTIFICATEUR, "a"), (typeToken.PARENG, "+"), (typeToken.CARACTERE, "'a'")]) 
     analyseur = AnalyseurExpr(lexer)
     try:
       analyseur.appel()
@@ -40,7 +40,7 @@ class TestAnalyseurExpr(unittest.TestCase):
     self.assertTrue(False)
 
   def test_appelSansParamettres(self):
-    lexer = FauxLexer([Token(typeToken.IDENTIFICATEUR, "abcd", 0, 0), Token(typeToken.PARENG, "+", 0, 1), Token(typeToken.PAREND, ")", 0, 2)]) 
+    lexer = FauxLexer.builder([(typeToken.IDENTIFICATEUR, "abcd"), (typeToken.PARENG, "+"), (typeToken.PAREND, ")")]) 
     analyseur = AnalyseurExpr(lexer)
     expr = analyseur.appel()
 
@@ -49,7 +49,7 @@ class TestAnalyseurExpr(unittest.TestCase):
     self.assertListEqual([], expr.params)
 
   def test_appelAvecDeuxParamettres(self):
-    lexer = FauxLexer([Token(typeToken.IDENTIFICATEUR, "abcd", 0, 0), Token(typeToken.PARENG, "+", 0, 1),  Token(typeToken.ENTIER, "5", 0, 2), Token(typeToken.COMMA, ",", 0, 3), Token(typeToken.CARACTERE, "'f'", 0, 4), Token(typeToken.PAREND, ")", 0, 2)]) 
+    lexer = FauxLexer.builder([(typeToken.IDENTIFICATEUR, "abcd"), (typeToken.PARENG, "+"),  (typeToken.ENTIER, "5"), (typeToken.COMMA, ","), (typeToken.CARACTERE, "'f'"), (typeToken.PAREND, ")")]) 
     analyseur = AnalyseurExpr(lexer)
     expr = analyseur.appel()
 
@@ -62,7 +62,7 @@ class TestAnalyseurExpr(unittest.TestCase):
     self.assertEqual(expr.params[1].literal, "'f'")
 
   def test_appelVirguleManquante(self):
-    lexer = FauxLexer([Token(typeToken.IDENTIFICATEUR, "abcd", 0, 0), Token(typeToken.PARENG, "+", 0, 1),  Token(typeToken.ENTIER, "5", 0, 2), Token(typeToken.CARACTERE, "'f'", 0, 4), Token(typeToken.PAREND, ")", 0, 2)]) 
+    lexer = FauxLexer.builder([(typeToken.IDENTIFICATEUR, "abcd"), (typeToken.PARENG, "+"),  (typeToken.ENTIER, "5"), (typeToken.CARACTERE, "'f'"), (typeToken.PAREND, ")")]) 
     analyseur = AnalyseurExpr(lexer)
     try:
       analyseur.appel()
@@ -73,7 +73,7 @@ class TestAnalyseurExpr(unittest.TestCase):
 
 
   def test_addition(self):
-    lexer = FauxLexer([Token(typeToken.IDENTIFICATEUR, "a", 0, 0), Token(typeToken.PLUS, "+", 0, 1), Token(typeToken.ENTIER, "2", 0, 2)])
+    lexer = FauxLexer.builder([(typeToken.IDENTIFICATEUR, "a"), (typeToken.PLUS, "+"), (typeToken.ENTIER, "2")])
     analyseur = AnalyseurExpr(lexer)
     expr = analyseur._addition()
     self.assertIsInstance(expr, noeud.Binaire)

@@ -32,7 +32,7 @@ class TestAnalyseurInstr(unittest.TestCase):
         expr = AnalyseurExpr(lexer)
         analyseur = AnalyseurInstr(lexer, expr)
         result = analyseur.instr()
-        self.assertIs(result, noeud.Return)
+        self.assertIsInstance(result, noeud.Return)
 
 
 

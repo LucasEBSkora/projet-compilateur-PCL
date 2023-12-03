@@ -41,9 +41,10 @@ mots_cles = {"access":    typeToken.ACCESS,
             }
 
 class Token:
-    def __init__(self, type, value, position):
+    def __init__(self, type, value, ligne, colomne):
         self.type = type
         self.value = value
-        self.position = position
+        self.ligne = ligne
+        self.colomne = colomne
 
 

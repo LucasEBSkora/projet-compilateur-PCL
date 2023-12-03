@@ -1,6 +1,9 @@
 import noeud
 from TypeToken import typeToken
+from ExceptionSyntatique import ExceptionSyntatique
+
 #parser expr
+
 class AnalyseurExpr:
   def __init__(self, analyseurLexique):
     self.lexeur = analyseurLexique
@@ -154,10 +157,9 @@ class AnalyseurExpr:
     return noeud.CharacterApostrofeVal(expr)
   
   def appel(self):
-    id = self.lexeur.peek()
+    id = self.lexeur.next()
     if id.type != typeToken.IDENTIFICATEUR:
-      print(f"unexpected '{id.value}' at {id.position}")
-      exit(1)
+      raise ExceptionSyntatique(f"unexpected {id.value}", id.ligne, id.colomne)
 
     if not self._prochainTokenEst(typeToken.PARENG):
       return noeud.Ident(id.value)
@@ -170,10 +172,9 @@ class AnalyseurExpr:
         self.lexeur.next()
       elif not self._prochainTokenEst(typeToken.PAREND):
         token = self.lexeur.next()
-        print(f"expected ')' or ',' after call parameter, got {token.value} instead")
-        exit(1)
+        raise ExceptionSyntatique(f"expected ')' or ',' after call parameter, got {token.value}", token.ligne, token.colomne)
     self.lexeur.next()
-    return noeud.Appel(id, params)
+    return noeud.Appel(id.value, params)
     
   def _prochainTokenEst(self, type):
     return self.lexeur.peek().type == type

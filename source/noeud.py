@@ -40,8 +40,8 @@ class CharacterApostrofeVal:
     return f"character'val({self.expr})"
 
 class Appel:
-  def __init__(self, ident, params):
-    self.ident = ident
+  def __init__(self, nom, params):
+    self.nom = nom
     self.params = params
 
   def __str__(self):

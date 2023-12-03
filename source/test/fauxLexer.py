@@ -11,7 +11,7 @@ class FauxLexer:
   def peek(self):
     if self.indice < len(self.tokens):
       return self.tokens[self.indice]
-    return Token(typeToken.EOF, "", 0)
+    return Token(typeToken.EOF, "end of file", 0, 0)
   def next(self):
       valeur = self.peek()
       self.indice += 1

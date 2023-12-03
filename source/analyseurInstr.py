@@ -6,8 +6,9 @@ from analyseurExpr import AnalyseurExpr
 
 class AnalyseurInstr:
 
-    def __init__(self, analyseurLexique):
+    def __init__(self, analyseurLexique, analyseurExpr):
         self.lexeur = analyseurLexique
+        self.analyseurExpr = analyseurExpr
 
     
     def instr(self):
@@ -17,7 +18,7 @@ class AnalyseurInstr:
             self.lexeur.next()
             if (self.verification(typeToken.SEMICOLON)):
                 return noeud.Return(None)
-            acces = AnalyseurExpr.expr()
+            acces = self.analyseurExpr.expr()
             self.verification(typeToken.SEMICOLON)
             return noeud.Return(acces)
         

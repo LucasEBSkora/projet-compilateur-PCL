@@ -1,5 +1,4 @@
 import noeud
-from analyseurExpr import analyseurExpr
 from TypeToken import typeToken
 #parser fichier
 class AnalyseurFichier:
@@ -78,12 +77,12 @@ class AnalyseurFichier:
     
     def params(self):
         params = []
-        self.check_token(typeToken.OPEN)
+        self.check_token(typeToken.PARENG)
         params.append(self.param())
         while self.lexeur.peek().type == typeToken.SEMICOLON:
             self.check_token(typeToken.SEMICOLON)
             params.append(self.param())
-        self.check_token(typeToken.CLOSE)
+        self.check_token(typeToken.PAREND)
         return params
     
     def param(self):
@@ -115,8 +114,8 @@ class AnalyseurFichier:
             idents.append(self.check_token(typeToken.IDENTIFICATEUR))
         self.check_token(typeToken.COLON)
         typage = self.typage()
-        if self.lexeur.peek().type == typeToken.ASSIGN:
-            self.check_token(typeToken.ASSIGN)
+        if self.lexeur.peek().type == typeToken.AFFECT:
+            self.check_token(typeToken.AFFECT)
             expr = self.analyseurExpr.expr()
         self.check_token(typeToken.SEMICOLON)
         return noeud.Var(idents,typage,expr)

@@ -1,12 +1,8 @@
 from sys import argv
-from lexer import lexer
+from lexer import Tokens
 from analyseurExpr import AnalyseurExpr
+from analyseurInstr import AnalyseurInstr
 from analyseurFichier import AnalyseurFichier
-
-
-analyseurExpr = AnalyseurExpr(None)
-AnalyseurFichier = AnalyseurFichier(None, analyseurExpr)
-print(argv)
 
 if len(argv) == 1:
   print("misssing source file!")
@@ -19,8 +15,14 @@ except ():
   exit(1)
 
 source_string = source.read()
-# print (source_string)
 
-tokens, _ = lexer(source_string)
+tokens = Tokens()
+tokens.lexer(source_string)
 
-print(tokens)
+analyseurExpr = AnalyseurExpr(tokens)
+AnalyseurInstr = AnalyseurInstr(tokens, analyseurExpr)
+AnalyseurFichier = AnalyseurFichier(tokens, AnalyseurInstr, analyseurExpr)
+
+AST = AnalyseurFichier.fichier()
+
+print(AST)

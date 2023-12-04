@@ -28,7 +28,8 @@ class AnalyseurInstr:
         if (self.prochainToken(typeToken.BEGIN)):
             instrList = []
             self.lexeur.next()
-            self.repetitionInstr(typeToken.END)
+            instrList = self.repetitionInstr(typeToken.END)
+            self.verification(typeToken.END)
             self.verification(typeToken.SEMICOLON)
             return noeud.Begin(instrList)
             

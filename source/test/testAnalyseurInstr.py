@@ -56,6 +56,15 @@ class TestAnalyseurInstr(unittest.TestCase):
         self.assertIsInstance(result, noeud.Return)
         self.assertEqual("5", result.expr.literal)
 
+    def test_begin_instr_end(self):
+        lexer = FauxLexer.builder([(typeToken.BEGIN, "begin"),(typeToken.RETURN, "return"),(typeToken.ENTIER, "5") ,(typeToken.SEMICOLON, ";"), (typeToken.END, "end"), (typeToken.SEMICOLON, ";")])
+        expr = AnalyseurExpr(lexer)
+        analyseur = AnalyseurInstr(lexer, expr)
+        result = analyseur.instr()
+        self.assertIsInstance(result, noeud.Begin)
+        self.assertEqual(1, len(result.instr))
+        self.assertEqual("5", result.instr[0].expr.literal)
+
 
 
 if __name__ == '__main__':

@@ -26,13 +26,35 @@ class TestAnalyseurInstr(unittest.TestCase):
         instr.verification(typeToken.RETURN)
         self.assertIs(typeToken.SEMICOLON ,lexer.peek().type)
 
+    def test_repetitionInstr(self):
+        lexer = FauxLexer.builder([(typeToken.RETURN, "return"), (typeToken.SEMICOLON, ";"), (typeToken.RETURN, "return"),(typeToken.ENTIER, "10") ,
+                                   (typeToken.SEMICOLON, ";"), (typeToken.RETURN, "return"),(typeToken.ENTIER, "5") ,(typeToken.SEMICOLON, ";"), 
+                                   (typeToken.END, "end")])
+        expr = AnalyseurExpr(lexer)
+        instr = AnalyseurInstr(lexer, expr)
+        lista = instr.repetitionInstr(typeToken.END)
+        self.assertEqual(3, len(lista))
+        self.assertEqual(None, lista[0].expr)
+        self.assertEqual("10", lista[1].expr.literal)
+        self.assertEqual("5", lista[2].expr.literal)
 
-    def test_return_expr(self):
+
+
+    def test_return_without_expr(self):
         lexer = FauxLexer.builder([(typeToken.RETURN, "return"), (typeToken.SEMICOLON, ";")])
         expr = AnalyseurExpr(lexer)
         analyseur = AnalyseurInstr(lexer, expr)
         result = analyseur.instr()
         self.assertIsInstance(result, noeud.Return)
+        self.assertEqual(None, result.expr)
+
+    def test_return_expr(self):
+        lexer = FauxLexer.builder([(typeToken.RETURN, "return"),(typeToken.ENTIER, "5") ,(typeToken.SEMICOLON, ";")])
+        expr = AnalyseurExpr(lexer)
+        analyseur = AnalyseurInstr(lexer, expr)
+        result = analyseur.instr()
+        self.assertIsInstance(result, noeud.Return)
+        self.assertEqual("5", result.expr.literal)
 
 
 

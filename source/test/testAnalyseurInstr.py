@@ -129,6 +129,29 @@ class TestAnalyseurInstr(unittest.TestCase):
         self.assertEqual(0, len(result.listTuple))
         self.assertEqual(0, len(result.instrList3))
 
+
+    def test_if_avec_elseif_and_without_else(self):
+        lexer = FauxLexer.builder([(typeToken.IF, "if"), (typeToken.ENTIER, "5"), (typeToken.THEN, "then"), (typeToken.RETURN, "return"), 
+                                   (typeToken.IDENTIFICATEUR, "a"), (typeToken.SEMICOLON, ";"), (typeToken.RETURN, "return"), (typeToken.IDENTIFICATEUR, "b"), 
+                                   (typeToken.SEMICOLON, ";"), (typeToken.ELSEIF, "elseif"), (typeToken.IDENTIFICATEUR, "c"), (typeToken.THEN, "then"), 
+                                   (typeToken.RETURN, "return"), (typeToken.IDENTIFICATEUR, "d"), (typeToken.SEMICOLON, ";"), (typeToken.RETURN, "return"), 
+                                   (typeToken.IDENTIFICATEUR, "e"), (typeToken.SEMICOLON, ";"), (typeToken.ELSEIF, "elseif"), (typeToken.IDENTIFICATEUR, "f"), 
+                                   (typeToken.THEN, "then"), (typeToken.RETURN, "return"), (typeToken.SEMICOLON, ";"), (typeToken.END, "end"), (typeToken.IF, "if"), 
+                                   (typeToken.SEMICOLON, ";")])
+        expr = AnalyseurExpr(lexer)
+        analyseur = AnalyseurInstr(lexer, expr)
+        result = analyseur.instr()
+        self.assertIsInstance(result, noeud.If)
+        self.assertEqual("5" , result.expr1.literal)
+        self.assertEqual(2, len(result.instrList1))
+        self.assertEqual("a", result.instrList1[0].expr.nom)
+        self.assertEqual("b", result.instrList1[1].expr.nom)
+        self.assertEqual(2, len(result.listTuple))
+        self.assertEqual("c", result.listTuple[0][0].nom)
+        self.assertEqual("f", result.listTuple[1][0].nom)
+        self.assertEqual(None, result.listTuple[1][1][0].expr)
+        #self.assertEqual("d", result.listTuple[0][1][0].expr)
+        self.assertEqual(0, len(result.instrList3))
         
 
 

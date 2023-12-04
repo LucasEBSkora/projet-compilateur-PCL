@@ -144,7 +144,9 @@ class WhileLoop:
     self.instrList = instrList
 
 class ForLoop:
-  def __init__(self, expr1, expr2, instrList):
+  def __init__(self, ident, isReverse, expr1, expr2, instrList):
+    self.ident = ident
+    self.isReverse = isReverse
     self.expr1 = expr1
     self.expr2 = expr2
     self.instrList = instrList

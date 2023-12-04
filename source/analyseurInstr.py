@@ -47,7 +47,7 @@ class AnalyseurInstr:
             instrList2 = self.repetitionInstr(typeToken.ELSEIF, typeToken.ELSE, typeToken.END)
             if(self.prochainToken(typeToken.ELSEIF)):
                 while(self.prochainToken(typeToken.ELSEIF)):
-                    instrList3.clear()
+                    instrList3 = []
                     self.lexeur.next()
                     y = self.analyseurExpr.expr()
                     self.verification(typeToken.THEN)

@@ -57,13 +57,26 @@ class TestAnalyseurInstr(unittest.TestCase):
         self.assertEqual("5", result.expr.literal)
 
     def test_begin_instr_end(self):
-        lexer = FauxLexer.builder([(typeToken.BEGIN, "begin"),(typeToken.RETURN, "return"),(typeToken.ENTIER, "5") ,(typeToken.SEMICOLON, ";"), (typeToken.END, "end"), (typeToken.SEMICOLON, ";")])
+        lexer = FauxLexer.builder([(typeToken.BEGIN, "begin"),(typeToken.RETURN, "return"),(typeToken.ENTIER, "5") ,(typeToken.SEMICOLON, ";"), 
+                                   (typeToken.END, "end"), (typeToken.SEMICOLON, ";")])
         expr = AnalyseurExpr(lexer)
         analyseur = AnalyseurInstr(lexer, expr)
         result = analyseur.instr()
         self.assertIsInstance(result, noeud.Begin)
         self.assertEqual(1, len(result.instr))
         self.assertEqual("5", result.instr[0].expr.literal)
+
+    def test_while(self):
+        lexer = FauxLexer.builder([(typeToken.WHILE, "while"),(typeToken.IDENTIFICATEUR, "a") ,(typeToken.LOOP, "loop"), (typeToken.RETURN, "return"),
+                                   (typeToken.ENTIER, "5") ,(typeToken.SEMICOLON, ";"), (typeToken.END, "end"), (typeToken.LOOP, "loop"), (typeToken.SEMICOLON, ";") ])
+        expr = AnalyseurExpr(lexer)
+        analyseur = AnalyseurInstr(lexer, expr)
+        result = analyseur.instr()
+        self.assertIsInstance(result, noeud.WhileLoop)
+        self.assertEqual(1, len(result.instrList))
+        self.assertEqual("5", result.instrList[0].expr.literal)
+        self.assertEqual("a", result.expr.nom)
+
 
 
 

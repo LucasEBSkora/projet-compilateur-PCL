@@ -78,7 +78,38 @@ class TestAnalyseurInstr(unittest.TestCase):
         self.assertEqual("a", result.expr.nom)
 
     def test_for_without_reverse(self):
-        lexer = FauxLexer.builder([(typeToken.RETURN, "return"),(typeToken.ENTIER, "5") ,(typeToken.SEMICOLON, ";")])
+        lexer = FauxLexer.builder([(typeToken.FOR, "for"),(typeToken.IDENTIFICATEUR, "b"), (typeToken.IN, "in"), (typeToken.IDENTIFICATEUR, "a"),
+                                   (typeToken.DEUXPOINTS, ".."), (typeToken.IDENTIFICATEUR, "c"), (typeToken.LOOP, "loop"), (typeToken.RETURN, "return"),
+                                   (typeToken.ENTIER, "5") ,(typeToken.SEMICOLON, ";"), (typeToken.RETURN, "return"), (typeToken.ENTIER, "7") ,
+                                   (typeToken.SEMICOLON, ";"), (typeToken.END, "end"), (typeToken.LOOP, "loop"), (typeToken.SEMICOLON, ";")])
+        expr = AnalyseurExpr(lexer)
+        analyseur = AnalyseurInstr(lexer, expr)
+        result = analyseur.instr()
+        self.assertIsInstance(result, noeud.ForLoop)
+        self.assertEqual("b", result.ident)
+        self.assertFalse(result.isReverse)
+        self.assertEqual("a", result.expr1.nom)
+        self.assertEqual("c", result.expr2.nom)
+        self.assertEqual("5", result.instrList[0].expr.literal)
+        self.assertEqual("7", result.instrList[1].expr.literal)
+
+
+    def test_for_avec_reverse(self):
+        lexer = FauxLexer.builder([(typeToken.FOR, "for"),(typeToken.IDENTIFICATEUR, "b"), (typeToken.IN, "in"), (typeToken.REVERSE, "reverse"), 
+                                   (typeToken.IDENTIFICATEUR, "a"), (typeToken.DEUXPOINTS, ".."), (typeToken.IDENTIFICATEUR, "c"), (typeToken.LOOP, "loop"), 
+                                   (typeToken.RETURN, "return"), (typeToken.ENTIER, "5") ,(typeToken.SEMICOLON, ";"), (typeToken.RETURN, "return"), 
+                                   (typeToken.ENTIER, "7"), (typeToken.SEMICOLON, ";"), (typeToken.END, "end"), (typeToken.LOOP, "loop"), (typeToken.SEMICOLON, ";")])
+        expr = AnalyseurExpr(lexer)
+        analyseur = AnalyseurInstr(lexer, expr)
+        result = analyseur.instr()
+        self.assertIsInstance(result, noeud.ForLoop)
+        self.assertEqual("b", result.ident)
+        self.assertTrue(result.isReverse)
+        self.assertEqual("a", result.expr1.nom)
+        self.assertEqual("c", result.expr2.nom)
+        self.assertEqual("5", result.instrList[0].expr.literal)
+        self.assertEqual("7", result.instrList[1].expr.literal)
+
 
 
 

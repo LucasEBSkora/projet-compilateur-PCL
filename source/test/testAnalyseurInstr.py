@@ -77,6 +77,9 @@ class TestAnalyseurInstr(unittest.TestCase):
         self.assertEqual("5", result.instrList[0].expr.literal)
         self.assertEqual("a", result.expr.nom)
 
+    def test_for_without_reverse(self):
+        lexer = FauxLexer.builder([(typeToken.RETURN, "return"),(typeToken.ENTIER, "5") ,(typeToken.SEMICOLON, ";")])
+
 
 
 

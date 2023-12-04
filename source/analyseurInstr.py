@@ -68,10 +68,13 @@ class AnalyseurInstr:
         if(self.prochainToken(typeToken.FOR)):
             instrList5 = []
             self.lexeur.next()
-            l = self.ident()
+            if(self.prochainToken(typeToken.IDENTIFICATEUR)):
+                ident = self.lexeur.peek().value
+            self.verification(typeToken.IDENTIFICATEUR)
             self.verification(typeToken.IN)
             if(self.prochainToken(typeToken.REVERSE)):
-                pass
+                isReverse = True
+            else: isReverse = False
             self.lexeur.next()
             x = self.analyseurExpr.expr()
             self.verification(typeToken.DEUXPOINTS)
@@ -81,7 +84,7 @@ class AnalyseurInstr:
             self.verification(typeToken.END)
             self.verification(typeToken.LOOP)
             self.verification(typeToken.SEMICOLON)
-            return noeud.ForLoop(x,y, instrList5)
+            return noeud.ForLoop(ident, isReverse, x, y, instrList5)
 
 
         # while <expr> loop <instr>+ end loop ;

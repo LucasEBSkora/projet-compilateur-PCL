@@ -74,8 +74,8 @@ class AnalyseurInstr:
             self.verification(typeToken.IN)
             if(self.prochainToken(typeToken.REVERSE)):
                 isReverse = True
+                self.verification(typeToken.REVERSE)
             else: isReverse = False
-            self.lexeur.next()
             x = self.analyseurExpr.expr()
             self.verification(typeToken.DEUXPOINTS)
             y = self.analyseurExpr.expr()

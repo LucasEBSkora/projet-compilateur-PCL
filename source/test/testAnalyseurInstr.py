@@ -201,7 +201,7 @@ class TestAnalyseurInstr(unittest.TestCase):
         self.assertEqual(2, len(result.instrList3))
         self.assertEqual("2", result.instrList3[0].expr.literal)
         self.assertEqual("g", result.instrList3[1].expr.nom)
-    #not working yet
+
     def test_affectation(self):
         lexer = FauxLexer.builder([(typeToken.IDENTIFICATEUR, "a"),(typeToken.AFFECT, ":="), (typeToken.ENTIER, "5"), (typeToken.SEMICOLON, ";")])
         expr = AnalyseurExpr(lexer)
@@ -215,14 +215,14 @@ class TestAnalyseurInstr(unittest.TestCase):
         analyseur = AnalyseurInstr(lexer, expr)
         result = analyseur.instr()
         self.assertIsInstance(result, noeud.Appel)
-    #not working yet
+
     def test_ident(self):
         lexer = FauxLexer.builder([(typeToken.IDENTIFICATEUR, "a"), (typeToken.SEMICOLON, ";")])
         expr = AnalyseurExpr(lexer)
         analyseur = AnalyseurInstr(lexer, expr)
         result = analyseur.instr()
         self.assertIsInstance(result, noeud.Ident)
-    #not working yet
+
     def test_ident_expr(self):
         lexer = FauxLexer.builder([(typeToken.IDENTIFICATEUR, "a"), (typeToken.AFFECT, ":="), (typeToken.ENTIER, "5"), (typeToken.SEMICOLON, ";")])
         expr = AnalyseurExpr(lexer)

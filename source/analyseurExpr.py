@@ -95,29 +95,30 @@ class AnalyseurExpr:
     while self._prochainTokenEst(typeToken.POINT):
       self.lexeur.next()
 
-      id = self.lexeur.next()
       if not self._prochainTokenEst(typeToken.IDENTIFICATEUR):
-        print(f"expected identifier after . at {id.position}, got {id.value} instead")
+        raise ExceptionSyntatique(f"expected identifier after ., got {id.value} instead", id.ligne, id.colomne)
+      
+      id = self.lexeur.next()
 
-      expr = noeud.Access(expr, id)
+      expr = noeud.Binaire(expr, '.', noeud.Ident(id.value))
 
     return expr
 
   def _primaire(self):
     literal = self._essayerLiteral()
-    if not (literal is None):
+    if literal is not None:
       return literal
     
     exprParenthese = self._essayerParenthese()
-    if not (exprParenthese is None):
+    if exprParenthese is not None:
       return exprParenthese
     
     newExpr = self._essayerNew()
-    if not (newExpr is None):
+    if newExpr is not None:
       return newExpr
     
     character_val = self._essayerCharacterVal()
-    if not (character_val is None):
+    if character_val is not None:
       return character_val
     
     return self.appel()
@@ -134,26 +135,36 @@ class AnalyseurExpr:
     expr = self.expr()
     if not self._prochainTokenEst(typeToken.PAREND):
       faux_token = self.lexeur.next()
-      print(f"expected ')' at ${faux_token.position}, got {faux_token.value} instead")
-      exit(1)
+      raise ExceptionSyntatique(f"expected ')' got {faux_token.value} instead", faux_token.ligne, faux_token.colomne)
     self.lexeur.next()
     return expr
   
   def _essayerNew(self):
     if not self._prochainTokenEst(typeToken.NEW):
       return None
+    self.lexeur.next()
     id = self.lexeur.next()
     if id.type != typeToken.IDENTIFICATEUR:
-      print(f"expected new identifier at ${id.position}, got {id.value} instead")
-      exit(1)
-    return id
+      raise ExceptionSyntatique(f"expected new identifier instead of {id.value}", id.ligne, id.colomne)
+    return noeud.New(id.value)
     
   def _essayerCharacterVal(self):
     if not self._prochainTokenEst(typeToken.CHARACTER_APOSTROFE_VAL):
       return None
     self.lexeur.next()
 
+    if not self._prochainTokenEst(typeToken.PARENG):
+      faux_token = self.lexeur.next()
+      raise ExceptionSyntatique(f"expected '(', got {faux_token.value} instead", faux_token.ligne, faux_token.colomne)
+    self.lexeur.next()
+
     expr = self.expr()
+
+    if not self._prochainTokenEst(typeToken.PAREND):
+      faux_token = self.lexeur.next()
+      raise ExceptionSyntatique(f"expected ')', got {faux_token.value} instead", faux_token.ligne, faux_token.colomne)
+    self.lexeur.next()
+    
     return noeud.CharacterApostrofeVal(expr)
   
   def appel(self):

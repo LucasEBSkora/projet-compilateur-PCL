@@ -32,6 +32,11 @@ class Ident:
   def __str__(self):
     return str(self.nom)
 
+class New:
+  def __init__(self, nom):
+    self.nom = nom
+  def __str__(self):
+    return f"new({self.nom})"
 
 class CharacterApostrofeVal:
   def __init__(self, expr):

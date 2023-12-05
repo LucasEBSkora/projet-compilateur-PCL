@@ -102,17 +102,16 @@ class AnalyseurInstr:
 
 
         k = self.analyseurExpr.acces()
-
         # <accès> := <expr>;
-        if(k is noeud.Binaire and k.operateur == "."):
+        if( isinstance(k, noeud.Binaire) and k.operateur == "."):
             self.verification(typeToken.AFFECT)
             p = self.analyseurExpr.expr()
             self.verification(typeToken.SEMICOLON)
             return noeud.Affectation(k,p)
-        elif(k is noeud.Appel): # <appel> ;
+        elif(isinstance(k, noeud.Appel)): # <appel> ;
             self.verification(typeToken.SEMICOLON)
             return k
-        elif(k is noeud.Ident):
+        elif(isinstance(k, noeud.Ident)):
             if(self.prochainToken(typeToken.SEMICOLON)): # ident ;
                 return k
             else:  # ident := <expr>;

@@ -49,11 +49,13 @@
 <accès>      ::= <primaire> <_accès>
 <_accès>     ::=  ε
               | . <ident>
-<primaire>       ::= <entier> | <caractere> | true | false | null
+<primaire>       ::= <literal>
                   | ( <expr> )
                   | new <ident>
                   | character'val(<expr>)
                   | <appel>
+
+<literal> ::= <entier> | <caractere> | true | false | null
 
 <appel> ::= <ident> <_appel>
 

@@ -44,15 +44,15 @@ class typeToken(Enum):
     DIV = 37 # /
     POINT = 38 # . (accès) 
     AFFECT = 39 # :=
+    SEMICOLON = 44 #;
+    COMMA = 46 #,
+    COLON = 47 #:
+    PARENG = 49 #(
+    PAREND = 50 #)
+    DEUXPOINTS = 51 #..
     ENTIER = 40
     CARACTERE = 41
     IDENTIFICATEUR = 42
     ADA = 43 #"Ada.Text_IO"
-    SEMICOLON = 44 #;
-    EOF = 45
-    COMMA = 46 #,
-    COLON = 47 #:
     CHARACTER_APOSTROFE_VAL = 48 #character'val
-    PARENG = 49 #(
-    PAREND = 50 #)
-    DEUXPOINTS = 51 #..
+    EOF = 45

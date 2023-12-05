@@ -11,6 +11,7 @@ mots_cles = {"access":    typeToken.ACCESS,
              "false":     typeToken.FALSE,
              "for":       typeToken.FOR,
              "function":  typeToken.FUNCTION,
+             "if":        typeToken.IF,
              "in":        typeToken.IN,
              "is":        typeToken.IS,
              "loop":      typeToken.LOOP,
@@ -30,7 +31,6 @@ mots_cles = {"access":    typeToken.ACCESS,
              "use":       typeToken.USE,
              "while":     typeToken.WHILE,
              "with":      typeToken.WITH,
-             "Ada.Text_IO" : typeToken.ADA,
             }
 
 class Token:

@@ -95,10 +95,9 @@ class AnalyseurExpr:
     while self._prochainTokenEst(typeToken.POINT):
       self.lexeur.next()
 
-      if not self._prochainTokenEst(typeToken.IDENTIFICATEUR):
-        raise ExceptionSyntatique(f"expected identifier after ., got {id.value} instead", id.ligne, id.colomne)
-      
       id = self.lexeur.next()
+      if id.type != typeToken.IDENTIFICATEUR:
+        raise ExceptionSyntatique(f"expected identifier after ., got {id.value} instead", id.ligne, id.colomne)
 
       expr = noeud.Binaire(expr, '.', noeud.Ident(id.value))
 

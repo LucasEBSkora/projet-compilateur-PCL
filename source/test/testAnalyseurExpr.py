@@ -48,6 +48,7 @@ class TestAnalyseurExpr(unittest.TestCase):
     expr =  analyseur.appel()
     self.assertIsInstance(expr, noeud.Ident)
     self.assertEqual("a", expr.nom)
+    self.assertEqual(lexer.peek().type, typeToken.PLUS)
   
   def test_appelSansParentheseDroite(self):
     lexer = FauxLexer.builder([(typeToken.IDENTIFICATEUR, "a"), (typeToken.PARENG, "+"), (typeToken.CARACTERE, "'a'")]) 
@@ -67,6 +68,7 @@ class TestAnalyseurExpr(unittest.TestCase):
     self.assertIsInstance(expr, noeud.Appel)
     self.assertEqual("abcd", expr.nom)
     self.assertListEqual([], expr.params)
+    self.assertEqual(lexer.peek().type, typeToken.EOF)
 
   def test_appelAvecDeuxParamettres(self):
     lexer = FauxLexer.builder([(typeToken.IDENTIFICATEUR, "abcd"), (typeToken.PARENG, "+"),  (typeToken.ENTIER, "5"), (typeToken.COMMA, ","), (typeToken.CARACTERE, "'f'"), (typeToken.PAREND, ")")]) 
@@ -80,6 +82,7 @@ class TestAnalyseurExpr(unittest.TestCase):
     self.assertEqual(expr.params[0].literal, "5")
     self.assertIsInstance(expr.params[1], noeud.Literal)
     self.assertEqual(expr.params[1].literal, "'f'")
+    self.assertEqual(lexer.peek().type, typeToken.EOF)
 
   def test_appelVirguleManquante(self):
     lexer = FauxLexer.builder([(typeToken.IDENTIFICATEUR, "abcd"), (typeToken.PARENG, "+"),  (typeToken.ENTIER, "5"), (typeToken.CARACTERE, "'f'"), (typeToken.PAREND, ")")]) 
@@ -98,11 +101,13 @@ class TestAnalyseurExpr(unittest.TestCase):
     self.assertIsInstance(expr, noeud.CharacterApostrofeVal)
     self.assertIsInstance(expr.expr, noeud.Literal)
     self.assertEqual(expr.expr.literal, "'a'")
+    self.assertEqual(lexer.peek().type, typeToken.EOF)
 
   def test_essayerCharacterValNon(self):
     lexer = FauxLexer.builder([(typeToken.ENTIER, "12")])
     analyseur = AnalyseurExpr(lexer)
     self.assertEqual(analyseur._essayerCharacterVal(), None)
+    self.assertEqual(lexer.peek().type, typeToken.ENTIER)
 
   def test_essayerCharacterValOui(self):
     lexer = FauxLexer.builder([(typeToken.CHARACTER_APOSTROFE_VAL, ""), (typeToken.PARENG, "("), (typeToken.CARACTERE, "'a'"), (typeToken.PAREND, "("),])
@@ -111,6 +116,7 @@ class TestAnalyseurExpr(unittest.TestCase):
     self.assertIsInstance(expr, noeud.CharacterApostrofeVal)
     self.assertIsInstance(expr.expr, noeud.Literal)
     self.assertEqual(expr.expr.literal, "'a'")
+    self.assertEqual(lexer.peek().type, typeToken.EOF)
 
   def test_essayerCharacterValSansParentheseGauche(self):
     lexer = FauxLexer.builder([(typeToken.CHARACTER_APOSTROFE_VAL, ""), (typeToken.CARACTERE, "'a'")])
@@ -136,6 +142,7 @@ class TestAnalyseurExpr(unittest.TestCase):
     lexer = FauxLexer.builder([(typeToken.PLUS, "+")])
     analyseur = AnalyseurExpr(lexer)
     self.assertEqual(analyseur._essayerNew(), None)
+    self.assertEqual(lexer.peek().type, typeToken.PLUS)
 
   def test_essayerNewSansIdentificateur(self):
     lexer = FauxLexer.builder([(typeToken.NEW, "new"), (typeToken.PARENG, "(")]) 
@@ -153,11 +160,13 @@ class TestAnalyseurExpr(unittest.TestCase):
     expr = analyseur._essayerNew()
     self.assertIsInstance(expr, noeud.New)
     self.assertEqual(expr.nom, "a_B")
+    self.assertEqual(lexer.peek().type, typeToken.EOF)
 
   def test_essayeParentheseNon(self):
     lexer = FauxLexer.builder([(typeToken.DEUXPOINTS, "..")])
     analyseur = AnalyseurExpr(lexer)
     self.assertEqual(analyseur._essayerNew(), None)
+    self.assertEqual(lexer.peek().type, typeToken.DEUXPOINTS)
 
   def test_essayerParentheseSansParentheseFerme(self):
     lexer = FauxLexer.builder([(typeToken.PARENG, "("), (typeToken.CARACTERE, "'a'")]) 
@@ -174,11 +183,13 @@ class TestAnalyseurExpr(unittest.TestCase):
     analyseur = AnalyseurExpr(lexer)
     expr = analyseur._essayerParenthese()
     self.assertIsInstance(expr, noeud.Binaire)
+    self.assertEqual(lexer.peek().type, typeToken.EOF)
 
   def test_essayerLiteralNon(self):
     lexer = FauxLexer.builder([(typeToken.IDENTIFICATEUR, "ab")])
     analyseur = AnalyseurExpr(lexer)
     self.assertEqual(analyseur._essayerLiteral(), None)
+    self.assertEqual(lexer.peek().type, typeToken.IDENTIFICATEUR)
 
   def test_esssayerLiteral(self):
     types_literales = {
@@ -195,6 +206,7 @@ class TestAnalyseurExpr(unittest.TestCase):
          expr = analyseur._essayerLiteral()
          self.assertIsInstance(expr, noeud.Literal)
          self.assertEqual(types_literales[type].value, expr.literal)
+         self.assertEqual(lexer.peek().type, typeToken.EOF)
     
   def test_primaire(self):
     expressions_primaires = {
@@ -210,13 +222,17 @@ class TestAnalyseurExpr(unittest.TestCase):
         analyseur = AnalyseurExpr(lexer)
         expr = analyseur._primaire()
         self.assertIsInstance(expr, type)
+        self.assertEqual(lexer.peek().type, typeToken.EOF)
 
   def test_AccesPrimaire(self):
-    analyseur = AnalyseurExpr(FauxLexer.builder([(typeToken.CARACTERE, 'a')]))
+    lexer = FauxLexer.builder([(typeToken.CARACTERE, 'a')])
+    analyseur = AnalyseurExpr(lexer)
     self.assertIsInstance(analyseur.acces(), noeud.Literal)
+    self.assertEqual(lexer.peek().type, typeToken.EOF)
   
   def test_acces(self):
-    analyseur = AnalyseurExpr(FauxLexer.builder([(typeToken.IDENTIFICATEUR, 'a'), (typeToken.POINT, '.'), (typeToken.IDENTIFICATEUR, 'b'), (typeToken.POINT, '.'), (typeToken.IDENTIFICATEUR, 'c')]))
+    lexer = FauxLexer.builder([(typeToken.IDENTIFICATEUR, 'a'), (typeToken.POINT, '.'), (typeToken.IDENTIFICATEUR, 'b'), (typeToken.POINT, '.'), (typeToken.IDENTIFICATEUR, 'c')])
+    analyseur = AnalyseurExpr(lexer)
     expr = analyseur.acces()
     self.assertIsInstance(expr, noeud.Binaire)
     self.assertEqual(expr.operateur, '.')
@@ -229,7 +245,16 @@ class TestAnalyseurExpr(unittest.TestCase):
     self.assertEqual(subExpr.gauche.nom, 'a')
     self.assertIsInstance(subExpr.droite, noeud.Ident)
     self.assertEqual(subExpr.droite.nom, 'b')
-  
+    self.assertEqual(lexer.peek().type, typeToken.EOF)
+
+  def test_accesSansIdentificateur(self):
+    analyseur = AnalyseurExpr(FauxLexer.builder([(typeToken.IDENTIFICATEUR, 'a'), (typeToken.POINT, '.'), (typeToken.IDENTIFICATEUR, 'b'), (typeToken.POINT, '.'), (typeToken.CARACTERE, "'c'")]))
+    try:
+      analyseur.acces()
+    except ExceptionSyntatique as e:
+      self.assertEqual(f"expected identifier after ., got 'c' instead", e.message)
+      return
+    self.assertTrue(False)
 
   def test_addition(self):
     lexer = FauxLexer.builder([(typeToken.IDENTIFICATEUR, "a"), (typeToken.PLUS, "+"), (typeToken.ENTIER, "2")])
@@ -241,6 +266,7 @@ class TestAnalyseurExpr(unittest.TestCase):
     self.assertEqual(expr.gauche.nom, "a")
     self.assertIsInstance(expr.droite, noeud.Literal)
     self.assertEqual(expr.droite.literal, "2")
+    self.assertEqual(lexer.peek().type, typeToken.EOF)
 
 if __name__ == '__main__':
     unittest.main()

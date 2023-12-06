@@ -208,9 +208,9 @@ class TestAnalyseurInstr(unittest.TestCase):
         analyseur = AnalyseurInstr(lexer, expr)
         result = analyseur.instr()
         self.assertIsInstance(result, noeud.Affectation)
-    #not working yet
+        
     def test_appel(self):
-        lexer = FauxLexer.builder([(typeToken.IDENTIFICATEUR, "a"), (typeToken.SEMICOLON, ";")])
+        lexer = FauxLexer.builder([(typeToken.IDENTIFICATEUR, "a"), (typeToken.PARENG, "("), (typeToken.PAREND, ")"), (typeToken.SEMICOLON, ";")])
         expr = AnalyseurExpr(lexer)
         analyseur = AnalyseurInstr(lexer, expr)
         result = analyseur.instr()

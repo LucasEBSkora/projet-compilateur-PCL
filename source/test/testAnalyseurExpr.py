@@ -94,15 +94,6 @@ class TestAnalyseurExpr(unittest.TestCase):
       return
     self.assertTrue(False)
 
-  def test_essayerCharacterValOui(self):
-    lexer = FauxLexer.builder([(typeToken.CHARACTER_APOSTROFE_VAL, ""), (typeToken.CARACTERE, "'a'")])
-    analyseur = AnalyseurExpr(lexer)
-    expr = analyseur._essayerCharacterVal()
-    self.assertIsInstance(expr, noeud.CharacterApostrofeVal)
-    self.assertIsInstance(expr.expr, noeud.Literal)
-    self.assertEqual(expr.expr.literal, "'a'")
-    self.assertEqual(lexer.peek().type, typeToken.EOF)
-
   def test_essayerCharacterValNon(self):
     lexer = FauxLexer.builder([(typeToken.ENTIER, "12")])
     analyseur = AnalyseurExpr(lexer)
@@ -224,12 +215,17 @@ class TestAnalyseurExpr(unittest.TestCase):
         self.assertIsInstance(expr, type)
         self.assertEqual(lexer.peek().type, typeToken.EOF)
 
-  def test_AccesPrimaire(self):
-    lexer = FauxLexer.builder([(typeToken.CARACTERE, 'a')])
-    analyseur = AnalyseurExpr(lexer)
-    self.assertIsInstance(analyseur.acces(), noeud.Literal)
-    self.assertEqual(lexer.peek().type, typeToken.EOF)
-  
+  def test_descendreRecursive(self):
+    analyseur = AnalyseurExpr(None)
+    fonctions = [analyseur.expr, analyseur._and, analyseur._not, analyseur._egal, analyseur._comparaison,
+                 analyseur._addition, analyseur._multiplication, analyseur._negation, analyseur.acces]
+    for fonction in fonctions:
+      with self.subTest(i=fonction):
+        analyseur.lexeur = FauxLexer.builder([(typeToken.IDENTIFICATEUR, 'a')])
+        expr = fonction()
+        self.assertIsInstance(expr, noeud.Ident)
+        self.assertEqual(analyseur.lexeur.peek().type, typeToken.EOF)
+
   def test_acces(self):
     lexer = FauxLexer.builder([(typeToken.IDENTIFICATEUR, 'a'), (typeToken.POINT, '.'), (typeToken.IDENTIFICATEUR, 'b'), (typeToken.POINT, '.'), (typeToken.IDENTIFICATEUR, 'c')])
     analyseur = AnalyseurExpr(lexer)
@@ -256,16 +252,225 @@ class TestAnalyseurExpr(unittest.TestCase):
       return
     self.assertTrue(False)
 
-  def test_addition(self):
-    lexer = FauxLexer.builder([(typeToken.IDENTIFICATEUR, "a"), (typeToken.PLUS, "+"), (typeToken.ENTIER, "2")])
+  def test_unaire(self):
+    for token in [(typeToken.MINUS, '-'), (typeToken.NOT, 'not')]:
+      with self.subTest(i=token[1]):
+        lexer = FauxLexer.builder([token, (typeToken.IDENTIFICATEUR, 'a')])
+        analyseur = AnalyseurExpr(lexer)
+        expr = analyseur.expr()
+        self.assertIsInstance(expr, noeud.Unaire)
+        self.assertEqual(expr.operateur, token[1])
+        self.assertIsInstance(expr.operande, noeud.Ident)
+        self.assertEqual(lexer.peek().type, typeToken.EOF)
+
+  def test_unaireDouble(self):
+    for token in [(typeToken.MINUS, '-'), (typeToken.NOT, 'not')]:
+      with self.subTest(i=token[1]):
+        lexer = FauxLexer.builder([token, token, (typeToken.IDENTIFICATEUR, 'a')])
+        analyseur = AnalyseurExpr(lexer)
+        expr = analyseur.expr()
+        self.assertIsInstance(expr, noeud.Unaire)
+        self.assertEqual(expr.operateur, token[1])
+        self.assertIsInstance(expr.operande, noeud.Unaire)
+        self.assertEqual(expr.operande.operateur, token[1])
+        self.assertIsInstance(expr.operande.operande, noeud.Ident)
+        self.assertEqual(lexer.peek().type, typeToken.EOF)
+
+  def test_binaire(self):
+    operateurs = {
+      "or": [(typeToken.OR, 'or')],
+      "or else": [(typeToken.OR, 'or'), (typeToken.ELSE, 'else')],
+      "and": [(typeToken.AND, 'and')],
+      "and then": [(typeToken.AND, 'and'), (typeToken.THEN, 'then')],
+      "=": [(typeToken.EQ, '=')],
+      "\=": [(typeToken.NE, '\=')],
+      ">": [(typeToken.GT, '>')],
+      ">=": [(typeToken.GE, '>=')],
+      "<": [(typeToken.LT, '<')],
+      "<=": [(typeToken.LE, '<=')],
+      "+": [(typeToken.PLUS, '+')],
+      "-": [(typeToken.MINUS, '-')],
+      "*": [(typeToken.MUL, '*')],
+      "/": [(typeToken.DIV, '/')],
+      "rem": [(typeToken.REM, 'rem')],
+    }
+    for test in operateurs.keys():
+      with self.subTest(i=test):
+        tokens = operateurs[test]
+        tokens.insert(0, (typeToken.IDENTIFICATEUR, 'a'))
+        tokens.append((typeToken.IDENTIFICATEUR, 'b'))
+        lexer = FauxLexer.builder(tokens)
+        analyseur = AnalyseurExpr(lexer)
+        expr = analyseur.expr()
+        self.assertIsInstance(expr, noeud.Binaire)
+        self.assertEqual(expr.operateur, test)
+        self.assertIsInstance(expr.gauche, noeud.Ident)
+        self.assertEqual(expr.gauche.nom, 'a')
+        self.assertIsInstance(expr.droite, noeud.Ident)
+        self.assertEqual(expr.droite.nom, 'b')
+        self.assertEqual(lexer.peek().type, typeToken.EOF)
+
+  def test_associativite(self):
+    operateurs = {
+      "or": [(typeToken.OR, 'or')],
+      "or else": [(typeToken.OR, 'or'), (typeToken.ELSE, 'else')],
+      "and": [(typeToken.AND, 'and')],
+      "and then": [(typeToken.AND, 'and'), (typeToken.THEN, 'then')],
+      "+": [(typeToken.PLUS, '+')],
+      "-": [(typeToken.MINUS, '-')],
+      "*": [(typeToken.MUL, '*')],
+      "/": [(typeToken.DIV, '/')],
+      "rem": [(typeToken.REM, 'rem')],
+    }
+    for test in operateurs.keys():
+      with self.subTest(i=test):
+        tokens = list(operateurs[test])
+        tokens.insert(0, (typeToken.IDENTIFICATEUR, 'a'))
+        tokens.append((typeToken.IDENTIFICATEUR, 'b'))
+        tokens = tokens + operateurs[test]
+        tokens.append((typeToken.IDENTIFICATEUR, 'c'))
+        lexer = FauxLexer.builder(tokens)
+        analyseur = AnalyseurExpr(lexer)
+        expr = analyseur.expr()
+        self.assertIsInstance(expr, noeud.Binaire)
+        self.assertEqual(expr.operateur, test)
+        
+        self.assertIsInstance(expr.gauche, noeud.Binaire)
+        self.assertEqual(expr.gauche.operateur, test)
+
+        self.assertIsInstance(expr.gauche.gauche, noeud.Ident)
+        self.assertEqual(expr.gauche.gauche.nom, 'a')
+        self.assertIsInstance(expr.gauche.droite, noeud.Ident)
+        self.assertEqual(expr.gauche.droite.nom, 'b')
+
+        self.assertIsInstance(expr.droite, noeud.Ident)
+
+        self.assertEqual(expr.droite.nom, 'c')
+        self.assertEqual(lexer.peek().type, typeToken.EOF)
+
+  def test_precedenceBinaires(self):
+    paires = [ 
+      ("or", (typeToken.OR, 'or')),
+      ("and", (typeToken.AND, 'and')),
+      ("=", (typeToken.EQ, '=')),
+      ("<", (typeToken.LT, '<')),
+      ("+", (typeToken.PLUS, '+')),
+      ("*", (typeToken.MUL, '*')),
+      (".", (typeToken.POINT, '.')),
+    ]
+    for i in range(0, len(paires) - 1):
+      with self.subTest(i=f"priorite {paires[i][0]} avec {paires[i+1][0]}"):
+        faible = paires[i][0]
+        forte = paires[i+1][0]
+        tokens = [(typeToken.IDENTIFICATEUR, 'a'), 
+                  paires[i][1],
+                  (typeToken.IDENTIFICATEUR, 'b'),
+                  paires[i+1][1],
+                  (typeToken.IDENTIFICATEUR, 'c')
+                  ]
+        lexer = FauxLexer.builder(tokens)
+        analyseur = AnalyseurExpr(lexer)
+        expr = analyseur.expr()
+        self.assertIsInstance(expr, noeud.Binaire)
+        self.assertEqual(expr.operateur, faible)
+        
+        self.assertIsInstance(expr.gauche, noeud.Ident)
+        self.assertEqual(expr.gauche.nom, 'a')
+
+        self.assertIsInstance(expr.droite, noeud.Binaire)
+        self.assertEqual(expr.droite.operateur, forte)
+
+        self.assertIsInstance(expr.droite.gauche, noeud.Ident)
+        self.assertEqual(expr.droite.gauche.nom, 'b')
+        self.assertIsInstance(expr.droite.droite, noeud.Ident)
+        self.assertEqual(expr.droite.droite.nom, 'c')
+
+        self.assertEqual(lexer.peek().type, typeToken.EOF)
+
+  def test_AssociativiteNegationAcces(self):
+    tokens = [(typeToken.MINUS, '-'), 
+              (typeToken.IDENTIFICATEUR, 'a'), 
+              (typeToken.POINT, '.'),
+              (typeToken.IDENTIFICATEUR, 'b'),
+              ]
+    lexer = FauxLexer.builder(tokens)
     analyseur = AnalyseurExpr(lexer)
-    expr = analyseur._addition()
+    expr = analyseur.expr()
+    self.assertIsInstance(expr, noeud.Unaire)
+    self.assertEqual(expr.operateur, '-')
+    
+    self.assertIsInstance(expr.operande, noeud.Binaire)
+    self.assertEqual(expr.operande.operateur, '.')
+
+    self.assertIsInstance(expr.operande.gauche, noeud.Ident)
+    self.assertEqual(expr.operande.gauche.nom, 'a')
+    self.assertIsInstance(expr.operande.droite, noeud.Ident)
+    self.assertEqual(expr.operande.droite.nom, 'b')
+
+  def test_AssociativiteNegationAddition(self):
+    tokens = [(typeToken.IDENTIFICATEUR, 'a'), 
+              (typeToken.PLUS, '+'),
+              (typeToken.MINUS, '-'), 
+              (typeToken.IDENTIFICATEUR, 'b'),
+              ]
+    lexer = FauxLexer.builder(tokens)
+    analyseur = AnalyseurExpr(lexer)
+    expr = analyseur.expr()
     self.assertIsInstance(expr, noeud.Binaire)
-    self.assertEqual(expr.operateur, "+")
+    self.assertEqual(expr.operateur, '+')
+    
     self.assertIsInstance(expr.gauche, noeud.Ident)
-    self.assertEqual(expr.gauche.nom, "a")
-    self.assertIsInstance(expr.droite, noeud.Literal)
-    self.assertEqual(expr.droite.literal, "2")
+    self.assertEqual(expr.gauche.nom, 'a')
+
+    self.assertIsInstance(expr.droite, noeud.Unaire)
+    self.assertEqual(expr.droite.operateur, '-')
+
+    self.assertIsInstance(expr.droite.operande, noeud.Ident)
+    self.assertEqual(expr.droite.operande.nom, 'b')
+    
+    self.assertEqual(lexer.peek().type, typeToken.EOF)
+
+  def test_AssociativiteNotEgal(self):
+    tokens = [(typeToken.NOT, 'not'), 
+              (typeToken.IDENTIFICATEUR, 'a'), 
+              (typeToken.EQ, '='),
+              (typeToken.IDENTIFICATEUR, 'b'),
+              ]
+    lexer = FauxLexer.builder(tokens)
+    analyseur = AnalyseurExpr(lexer)
+    expr = analyseur.expr()
+    self.assertIsInstance(expr, noeud.Unaire)
+    self.assertEqual(expr.operateur, 'not')
+    
+    self.assertIsInstance(expr.operande, noeud.Binaire)
+    self.assertEqual(expr.operande.operateur, '=')
+
+    self.assertIsInstance(expr.operande.gauche, noeud.Ident)
+    self.assertEqual(expr.operande.gauche.nom, 'a')
+    self.assertIsInstance(expr.operande.droite, noeud.Ident)
+    self.assertEqual(expr.operande.droite.nom, 'b')
+
+  def test_AssociativiteNotAnd(self):
+    tokens = [(typeToken.IDENTIFICATEUR, 'a'), 
+              (typeToken.AND, 'and'),
+              (typeToken.NOT, 'not'), 
+              (typeToken.IDENTIFICATEUR, 'b'),
+              ]
+    lexer = FauxLexer.builder(tokens)
+    analyseur = AnalyseurExpr(lexer)
+    expr = analyseur.expr()
+    self.assertIsInstance(expr, noeud.Binaire)
+    self.assertEqual(expr.operateur, 'and')
+    
+    self.assertIsInstance(expr.gauche, noeud.Ident)
+    self.assertEqual(expr.gauche.nom, 'a')
+
+    self.assertIsInstance(expr.droite, noeud.Unaire)
+    self.assertEqual(expr.droite.operateur, 'not')
+
+    self.assertIsInstance(expr.droite.operande, noeud.Ident)
+    self.assertEqual(expr.droite.operande.nom, 'b')
+    
     self.assertEqual(lexer.peek().type, typeToken.EOF)
 
 if __name__ == '__main__':

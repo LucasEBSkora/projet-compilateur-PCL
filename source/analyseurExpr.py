@@ -11,28 +11,28 @@ class AnalyseurExpr:
   def expr(self):
     gauche = self._and()
 
-    if self._prochainTokenEst(typeToken.OR):
+    while self._prochainTokenEst(typeToken.OR):
       labelNoeud = "or"
       self.lexeur.next()
       if self._prochainTokenEst(typeToken.ELSE):
         labelNoeud = "or else"
         self.lexeur.next()
-      droite = self.expr()
-      return noeud.Binaire(gauche, labelNoeud, droite)
+      droite = self._and()
+      gauche = noeud.Binaire(gauche, labelNoeud, droite)
     
     return gauche
 
   def _and(self):
     gauche = self._not()
 
-    if self._prochainTokenEst(typeToken.AND):
+    while self._prochainTokenEst(typeToken.AND):
       labelNoeud = "and"
       self.lexeur.next()
       if self._prochainTokenEst(typeToken.THEN):
         labelNoeud = "and then"
         self.lexeur.next()
-      droite = self._and()
-      return noeud.Binaire(gauche, labelNoeud, droite)
+      droite = self._not()
+      gauche = noeud.Binaire(gauche, labelNoeud, droite)
     
     return gauche
 
@@ -66,19 +66,19 @@ class AnalyseurExpr:
   def _addition(self):
     gauche = self._multiplication()
 
-    if self._prochainTokenDans([typeToken.PLUS, typeToken.MINUS]):
+    while self._prochainTokenDans([typeToken.PLUS, typeToken.MINUS]):
       label = self.lexeur.next().value
-      droite = self._addition()
-      return noeud.Binaire(gauche, label, droite)
+      droite = self._multiplication()
+      gauche = noeud.Binaire(gauche, label, droite)
     return gauche
 
   def _multiplication(self):
     gauche = self._negation()
 
-    if self._prochainTokenDans([typeToken.MUL, typeToken.DIV, typeToken.REM]):
+    while self._prochainTokenDans([typeToken.MUL, typeToken.DIV, typeToken.REM]):
       label = self.lexeur.next().value
-      droite = self._multiplication()
-      return noeud.Binaire(gauche, label, droite)
+      droite = self._negation()
+      gauche = noeud.Binaire(gauche, label, droite)
     return gauche
 
   def _negation(self):

@@ -8,6 +8,7 @@ incluire_parent()
 from lexeur import Lexeur
 from Token import mots_cles, Token
 from TypeToken import typeToken
+from ExceptionLexique import ExceptionLexique
 
 class TestLexer(unittest.TestCase):
   def creerObjetEtTesterUnSeuleToken(self, tokenAttendu, text):
@@ -97,7 +98,6 @@ class TestLexer(unittest.TestCase):
     text = "    \r\t\t\na            \n"
     lexer = Lexeur(text)
     token = lexer.next()
-    print(token)
     self.assertEqual(typeToken.IDENTIFICATEUR, token.type)
     self.assertEqual("a", token.value)
     self.assertEqual(2, token.ligne)
@@ -158,7 +158,42 @@ class TestLexer(unittest.TestCase):
     self.assertEqual("b", lexer.peek().value)
     self.assertEqual("b", lexer.next().value)
     self.assertEqual("c", lexer.next().value)
-    
+  
+  def test_caractereInattendu(self):
+    text = "abcd%"
+    try:
+      lexer = Lexeur(text)
+    except ExceptionLexique as e:
+      self.assertEqual("caractere inattendu %", e.message)
+      return
+    self.assertTrue(False)
+  
+  def test_caracterePasFini(self):
+    text = "'"
+    try:
+      lexer = Lexeur(text)
+    except ExceptionLexique as e:
+      self.assertEqual("literal de caractere pas fini", e.message)
+      return
+    self.assertTrue(False)
+
+  def test_caracterePasFerme(self):
+    text = "'a"
+    try:
+      lexer = Lexeur(text)
+    except ExceptionLexique as e:
+      self.assertEqual("literal de caractere pas fini", e.message)
+      return
+    self.assertTrue(False)
+
+  def test_caractereInvalide(self):
+    text = "'" + chr(1) + "'"
+    try:
+      lexer = Lexeur(text)
+    except ExceptionLexique as e:
+      self.assertEqual("literal de caractere invalide: caractere ASCII 1", e.message)
+      return
+    self.assertTrue(False)
 
 if __name__ == '__main__':
     unittest.main()

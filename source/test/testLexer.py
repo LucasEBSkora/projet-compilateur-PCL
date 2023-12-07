@@ -5,14 +5,13 @@ import string
 from incluire_parent import incluire_parent
 incluire_parent()
 
-from lexer import Tokens
+from lexeur import Lexeur
 from Token import mots_cles, Token
 from TypeToken import typeToken
 
 class TestLexer(unittest.TestCase):
   def creerObjetEtTesterUnSeuleToken(self, tokenAttendu, text):
-    lexer = Tokens()
-    lexer.lexer(text)
+    lexer = Lexeur(text)
     token = lexer.next()
     self.assertEqual(tokenAttendu.type, token.type)
     self.assertEqual(tokenAttendu.value, token.value)
@@ -59,7 +58,7 @@ class TestLexer(unittest.TestCase):
   def test_identifieEntiersPlusiersChiffres(self):
     text = "1258102842194"
     lexer = self.creerObjetEtTesterUnSeuleToken(Token(typeToken.ENTIER, text, 1, 1) , text)
-    self.assertEqual(typeToken.EOF, lexer.peek().next())
+    self.assertEqual(typeToken.EOF, lexer.peek().type)
 
   def test_identifieChaqueCaractere(self):
     for c in string.printable:
@@ -69,7 +68,7 @@ class TestLexer(unittest.TestCase):
 
   def test_identifieChaqueIdentificateurUnSeuleCaractere(self):
     for c in string.ascii_letters:
-      with self.subtest(msg=c):
+      with self.subTest(msg=c):
         self.creerObjetEtTesterUnSeuleToken(Token(typeToken.IDENTIFICATEUR, c, 1, 1), c)
 
   def test_identifieidentificateurAvecUnderline(self):
@@ -79,7 +78,7 @@ class TestLexer(unittest.TestCase):
   def test_identifieIdentificateursAvecChaqueChiffre(self):
     for i in range(0, 10):
       text = f"a{i}"
-      with self.subtest(msg=text):
+      with self.subTest(msg=text):
         self.creerObjetEtTesterUnSeuleToken(Token(typeToken.IDENTIFICATEUR, text, 1, 1), text)
 
   def test_identifieIdentificateursPlusLonges(self):
@@ -96,18 +95,16 @@ class TestLexer(unittest.TestCase):
 
   def test_enleveCaracteresBlancs(self):
     text = "    \r\t\t\na            \n"
-    lexer = Tokens()
-    lexer.lexer(text)
+    lexer = Lexeur(text)
     token = lexer.next()
+    print(token)
     self.assertEqual(typeToken.IDENTIFICATEUR, token.type)
     self.assertEqual("a", token.value)
     self.assertEqual(2, token.ligne)
-    self.assertEqual(9, token.colomne)
+    self.assertEqual(1, token.colomne)
 
   def creerObjetEtTesterPlusiersTokens(self, tokensAttendus, text):
-    lexer = Tokens()
-    lexer.lexer(text)
-    token = lexer.next()
+    lexer = Lexeur(text)
     for tokenAttendu in tokensAttendus:
       token = lexer.next()
       self.assertEqual(tokenAttendu.type, token.type)
@@ -117,18 +114,17 @@ class TestLexer(unittest.TestCase):
 
     return lexer 
 
-
-  def test_trouvePositionDebutTokensCorrectement(self):
+  def test_trouvePositionDebutLexeurCorrectement(self):
     text = "   aa\t\n\n\n\n 1234 + \n'c'"
-    tokensAttendus = [ Token(typeToken.IDENTIFICATEUR, "aa", 1, 3),
+    tokensAttendus = [ Token(typeToken.IDENTIFICATEUR, "aa", 1, 4),
       Token(typeToken.ENTIER, "1234", 5, 2),
-      Token(typeToken.PLUS, "+", 5, 6),
-      Token(typeToken.CARACTERE, "'c'", 6, 1)
-      Token(typeToken.EOF, "", 6, 4)
+      Token(typeToken.PLUS, "+", 5, 7),
+      Token(typeToken.CARACTERE, "'c'", 6, 1),
+      Token(typeToken.EOF, "end of file", 6, 4)
     ]
     self.creerObjetEtTesterPlusiersTokens(tokensAttendus, text)
 
-  def test_comprendPlusiersTokensEnsemble(self):
+  def test_comprendPlusiersLexeurEnsemble(self):
     text = "'a'+bbb-23/c"
     tokensAttendus = [ Token(typeToken.CARACTERE, "'a'", 1, 1),
       Token(typeToken.PLUS, "+", 1, 4),
@@ -137,7 +133,7 @@ class TestLexer(unittest.TestCase):
       Token(typeToken.ENTIER, "23", 1, 9),
       Token(typeToken.DIV, "/", 1, 11),
       Token(typeToken.IDENTIFICATEUR, "c", 1, 12),
-      Token(typeToken.EOF, "", 1, 13)
+      Token(typeToken.EOF, "end of file", 1, 13)
     ]
     self.creerObjetEtTesterPlusiersTokens(tokensAttendus, text)
 
@@ -149,18 +145,18 @@ class TestLexer(unittest.TestCase):
       Token(typeToken.ENTIER, "34", 1, 10),
       Token(typeToken.ENTIER, "56", 1, 13),
       Token(typeToken.IDENTIFICATEUR, "cc", 1, 16),
-      Token(typeToken.IDENTIFICATEUR, "dd", 1, 19),
-      Token(typeToken.EOF, "", 1, 13)
+      Token(typeToken.IDENTIFICATEUR, "dd", 2, 1),
+      Token(typeToken.EOF, "end of file", 2, 3)
     ]
     self.creerObjetEtTesterPlusiersTokens(tokensAttendus, text)
 
   def test_peekEtNext(self):
     text = "a b c d"
-    lexer = Tokens()
-    lexer.lexer(text)
+    lexer = Lexeur(text)
     self.assertEqual("a", lexer.next().value)
     self.assertEqual("b", lexer.peek().value)
     self.assertEqual("b", lexer.peek().value)
+    self.assertEqual("b", lexer.next().value)
     self.assertEqual("c", lexer.next().value)
     
 

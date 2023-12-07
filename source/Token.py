@@ -39,5 +39,7 @@ class Token:
         self.value = value
         self.ligne = ligne
         self.colomne = colomne
+    def __str__(self):
+        return f"({self.type}, {self.value}, {self.ligne}:{self.colomne})"
 
 

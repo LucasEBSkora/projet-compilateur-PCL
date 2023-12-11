@@ -36,4 +36,3 @@ try:
 except ExceptionSyntatique as e:
   print(str(e))
   exit(-1)
-

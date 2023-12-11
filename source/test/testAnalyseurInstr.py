@@ -61,7 +61,7 @@ class TestAnalyseurInstr(unittest.TestCase):
         expr = AnalyseurExpr(lexer)
         analyseur = AnalyseurInstr(lexer, expr)
         result = analyseur.instr()
-        self.assertIsInstance(result, noeud.Begin)
+        self.assertIsInstance(result, noeud.Block)
         self.assertEqual(1, len(result.instr))
         self.assertEqual("5", result.instr[0].expr.literal)
 

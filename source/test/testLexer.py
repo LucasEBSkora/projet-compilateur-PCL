@@ -150,6 +150,23 @@ class TestLexer(unittest.TestCase):
     ]
     self.creerObjetEtTesterPlusiersTokens(tokensAttendus, text)
 
+  def test_enleveCommentaires(self):
+    text = "a\n b + -- commentaire \nc"
+    tokensAttendus = [Token(typeToken.IDENTIFICATEUR, "a", 1, 1),
+      Token(typeToken.IDENTIFICATEUR, "b", 2, 2),
+      Token(typeToken.PLUS, "+", 2, 4),
+      Token(typeToken.IDENTIFICATEUR, "c", 3, 1),
+      Token(typeToken.EOF, "end of file", 3, 2)
+    ]
+    self.creerObjetEtTesterPlusiersTokens(tokensAttendus, text)
+  
+  def test_enleveCommentairesALaFin(self):
+    text = "a -- commentaire "
+    tokensAttendus = [Token(typeToken.IDENTIFICATEUR, "a", 1, 1),
+        Token(typeToken.EOF, "end of file", 1, 18)
+      ]
+    self.creerObjetEtTesterPlusiersTokens(tokensAttendus, text)
+    
   def test_peekEtNext(self):
     text = "a b c d"
     lexer = Lexeur(text)

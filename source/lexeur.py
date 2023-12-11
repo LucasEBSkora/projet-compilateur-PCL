@@ -39,7 +39,7 @@ class Lexeur:
       '/': lambda : self._siSouvantSinon('=', typeToken.NE, typeToken.DIV),
       '<': lambda : self._siSouvantSinon('=', typeToken.LE, typeToken.LT),
       '>': lambda : self._siSouvantSinon('=', typeToken.GE, typeToken.GT),
-      '-': lambda : self._ajouterToken(typeToken.MINUS),
+      '-': lambda : self._verifierCommentaire(),
       '+': lambda : self._ajouterToken(typeToken.PLUS),
       '*': lambda : self._ajouterToken(typeToken.MUL),
       '.': lambda : self._siSouvantSinon('.', typeToken.DEUXPOINTS, typeToken.POINT),
@@ -70,7 +70,8 @@ class Lexeur:
     if self._prochainCaractere() == char:
       self._avancer()
       self._ajouterToken(si)
-    self._ajouterToken(sinon)
+    else:
+      self._ajouterToken(sinon)
 
   def _caractere(self):
     if self._finSource():
@@ -100,14 +101,24 @@ class Lexeur:
     if prefixe == "Ada":
       if self._prochainCaracteresSont('.Text_IO'):
         self._ajouterToken(typeToken.ADA)
+        return
     elif prefixe == "character":
       if self._prochainCaracteresSont("'val"):
         self._ajouterToken(typeToken.CHARACTER_APOSTROFE_VAL)
+        return
     elif prefixe in mots_cles:
       self._ajouterToken(mots_cles[prefixe])
-    else:
-      self._ajouterToken(typeToken.IDENTIFICATEUR)
+      return
     
+    self._ajouterToken(typeToken.IDENTIFICATEUR)
+    
+  def _verifierCommentaire(self):
+    if not self._match('-'):
+      self._ajouterToken(typeToken.MINUS)
+      return
+    char = self.source[self.courant]
+    while not self._finSource() and self._avancer() != '\n':
+      pass
 
   def _prochainCaracteresSont(self, chars):
     courant = self.courant

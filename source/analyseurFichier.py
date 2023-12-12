@@ -87,7 +87,7 @@ class AnalyseurFichier:
         params.append(self.param())
         while self.lexeur.peek().type == typeToken.SEMICOLON:
             self.check_token(typeToken.SEMICOLON)
-            params.append(self.param())
+            params.extend(self.param())
         self.check_token(typeToken.PAREND)
         return params
     
@@ -106,7 +106,10 @@ class AnalyseurFichier:
         else:
             _mode = "in out"
         typage = self.typage()
-        return noeud.Param(idents,_mode,typage)
+        params = []
+        for ident in idents:
+            params.append(noeud.Param(ident,_mode,typage))
+        return params
     
     def mode(self):
         isIn = True

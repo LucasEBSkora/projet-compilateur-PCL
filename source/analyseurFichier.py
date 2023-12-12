@@ -32,8 +32,8 @@ class AnalyseurFichier:
         self.check_token(typeToken.SEMICOLON)
         if self.lexeur.peek().type != typeToken.EOF:
             return None
-            
-        return noeud.Fichier(identificateur,decl,instr)
+           
+        return noeud.Procedure(identificateur,NULL,instr,decl)
     
     def decl(self):
          match self.lexeur.peek().type:

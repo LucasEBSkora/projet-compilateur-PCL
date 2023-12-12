@@ -106,7 +106,7 @@ class AnalyseurFichier:
         else:
             _mode = "in out"
         typage = self.typage()
-        return noeud.Param(idents,mode,typage)
+        return noeud.Param(idents,_mode,typage)
     
     def mode(self):
         isIn = True

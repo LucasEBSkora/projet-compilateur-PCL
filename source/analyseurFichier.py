@@ -175,8 +175,8 @@ class AnalyseurFichier:
     def check_token(self, type, required = True):
         value = None
         if self.lexeur.peek().type != type and required:
-            print("Error: expected token type " + str(type) + " but got " + str(self.lexeur.peek().type))
-            exit(1)
+            raise ExceptionSyntatique(f"expected {type} instead of {self.lexeur.peek().value}", id.ligne, id.colomne)
+          
         else:
             value = self.lexeur.peek().value
             self.lexeur.next()

@@ -15,9 +15,15 @@ class AnalyseurFichier:
             self.check_token(token)
         identificateur = self.check_token(typeToken.IDENTIFICATEUR)
         self.check_token(typeToken.IS)
-        decl = self.decl()
+        decls = []
+        while self.lexeur.peek().type != typeToken.BEGIN:
+            decls.append(self.decl())
+    
         self.check_token(typeToken.BEGIN)
-        instr = self.analyseurInstr.instr()
+        instrs = []
+        while self.lexeur.peek().type != typeToken.END:
+            instrs.append(self.analyseurInstr.instr())
+        
         self.check_token(typeToken.END)
         if self.lexeur.peek().type == typeToken.IDENTIFICATEUR:
             if identificateur != self.lexeur.peek().value:
@@ -103,7 +109,7 @@ class AnalyseurFichier:
         if self.lexeur.peek() == typeToken.OUT:
             self.check_token(typeToken.OUT)
             isIn = False
-        return noeud.Mode(isIn)
+        return isIn
   
     def var(self):
         idents = []
@@ -157,7 +163,9 @@ class AnalyseurFichier:
         self.check_token(typeToken.RETURN)
         typage = self.typage()
         self.check_token(typeToken.IS)
-        decl = self.decl()
+        decl = []
+        while self.lexeur.peek().type != typeToken.BEGIN:
+            decl = self.decl()
         self.check_token(typeToken.BEGIN)
         instr = self.analyseurInstr.instr()
         self.check_token(typeToken.END)

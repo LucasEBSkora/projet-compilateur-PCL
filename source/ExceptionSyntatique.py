@@ -6,4 +6,4 @@ class ExceptionSyntatique(BaseException):
     self.colomne = colomne
   
   def __str__(self):
-    return f"Syntatic error at ({self.ligne}:{self.colomne}:{self.message})"
+    return f"Syntatic error at ({self.ligne}:{self.colomne}: {self.message})"

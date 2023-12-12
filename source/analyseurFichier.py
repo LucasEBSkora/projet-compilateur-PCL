@@ -100,6 +100,10 @@ class AnalyseurFichier:
             idents.append(self.check_token(typeToken.IDENTIFICATEUR))
         self.check_token(typeToken.COLON)
         mode = self.mode()
+        if mode :
+            mode = "in"
+        else:
+            mode = "in out"
         typage = self.typage()
         return noeud.Param(idents,mode,typage)
     

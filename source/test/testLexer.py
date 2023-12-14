@@ -67,6 +67,12 @@ class TestLexer(unittest.TestCase):
       with self.subTest(msg=str):
         self.creerObjetEtTesterUnSeuleToken(Token(typeToken.CARACTERE, str, 1, 1), str)
 
+  def test_identifieCharacteresDechappage(self):
+    for c in 'rtn0\\':
+      str = f"'\{c}'"
+      with self.subTest(msg=str):
+        self.creerObjetEtTesterUnSeuleToken(Token(typeToken.CARACTERE, str, 1, 1), str)
+
   def test_identifieChaqueIdentificateurUnSeuleCaractere(self):
     for c in string.ascii_letters:
       with self.subTest(msg=c):
@@ -150,6 +156,23 @@ class TestLexer(unittest.TestCase):
     ]
     self.creerObjetEtTesterPlusiersTokens(tokensAttendus, text)
 
+  def test_enleveCommentaires(self):
+    text = "a\n b + -- commentaire \nc"
+    tokensAttendus = [Token(typeToken.IDENTIFICATEUR, "a", 1, 1),
+      Token(typeToken.IDENTIFICATEUR, "b", 2, 2),
+      Token(typeToken.PLUS, "+", 2, 4),
+      Token(typeToken.IDENTIFICATEUR, "c", 3, 1),
+      Token(typeToken.EOF, "end of file", 3, 2)
+    ]
+    self.creerObjetEtTesterPlusiersTokens(tokensAttendus, text)
+  
+  def test_enleveCommentairesALaFin(self):
+    text = "a -- commentaire "
+    tokensAttendus = [Token(typeToken.IDENTIFICATEUR, "a", 1, 1),
+        Token(typeToken.EOF, "end of file", 1, 18)
+      ]
+    self.creerObjetEtTesterPlusiersTokens(tokensAttendus, text)
+    
   def test_peekEtNext(self):
     text = "a b c d"
     lexer = Lexeur(text)

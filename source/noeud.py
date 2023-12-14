@@ -1,8 +1,17 @@
 class Fichier:
-  def __init__(self,ident,decl,instr):
-    self.ident = ident
-    self.decl = decl
-    self.instr = instr
+  def __init__(self,idents,decls,instrs):
+    self.idents = idents
+    self.decls = decls
+    self.instrs = instrs
+
+  def __str__(self):
+    str = f"procedure({self.idents}, ["
+    for decl in self.decls:
+      str += f", {decl}"
+    str += "], ["
+    for instr in self.instrs:
+      str += f", {instr}"
+    return str + "])"
 
 class Binaire:
   def __init__(self, gauche, operateur, droite):
@@ -50,7 +59,11 @@ class Appel:
     self.params = params
 
   def __str__(self):
-    return f"{self.ident}({self.params})"
+    str = f"appel({self.nom}"
+    for param in self.params:
+      str += f", {param}"
+    return str + ")"
+    
 
 class Var:
   def __init__(self,ident,type,expr):
@@ -59,7 +72,10 @@ class Var:
     self.expr = expr
   
   def __str__(self):
-    return f'Var({self.type}, {self.ident},{self.expr})'
+    str = f'Var({self.type}, {self.ident}'
+    if self.expr is not None:
+      str += ', {self.expr}'
+    return str + ')'
   
 class Procedure:
   def __init__(self,ident,params,instr,decl):
@@ -69,26 +85,52 @@ class Procedure:
     self.decl = decl
   
   def __str__(self):
-    return f'Procedure({self.ident}, {self.params},{self.instr},{self.decl})'
+    str = f"procedure({self.idents}, ["
+    for param in self.params:
+      str += f", {param}"
+    str += "], ["
+    
+    for decl in self.decls:
+      str += f", {decl}"
+    str += "], ["
+
+    for instr in self.instrs:
+      str += f", {instr}"
+    return str + "])"
 
 class Function:
-  def __init__(self,ident,params,type,instr,decl):
+  def __init__(self,ident,params,type,instrs,decls):
     self.ident = ident
     self.params = params
     self.type = type
-    self.instr = instr
-    self.decl = decl 
-  
-  def __str__(self):
-    return f'Function({self.ident}, {self.params},{self.type},{self.instr},{self.decl})'
+    self.instrs = instrs
+    self.decls = decls
 
+  def __str__(self):
+    str = f"function({self.ident}, ["
+    for param in self.params:
+      str += f", {param}"
+    str += f"], {self.type}, ["
+    
+    for decl in self.decls:
+      str += f", {decl}"
+    str += "], ["
+
+    for instr in self.instrs:
+      str += f", {instr}"
+    return str + "])"
+  
 class Record:
   def __init__(self,ident,champs):
     self.ident = ident
     self.champs = champs
 
   def __str__(self):
-    return f'Record({self.ident}, {self.champs})'
+    str = f"Record({self.ident}, ["
+    for champ in self.champs:
+      str += f", {champ}"
+    str += f"])"
+    return str    
 
 class Access:
   def __init__(self,ident1,ident2):
@@ -96,7 +138,7 @@ class Access:
     self.ident2 = ident2
 
   def __str__(self):
-    return f'Access({self.indent1}, {self.ident2})'
+    return f'Access({self.ident1}, {self.ident2})'
 
 class Type:
   def __init__(self,isAccess,ident):
@@ -104,6 +146,8 @@ class Type:
     self.isAccess = isAccess
   
   def __str__(self):
+    if self.isAccess:
+      return f'accessType({self.ident})'
     return f'Type({self.ident}, {self.isAccess})'
 
 class Champs: 
@@ -117,7 +161,6 @@ class Champs:
 class Mode:
   def __init__(self,isIn):
     self.isIn = isIn
-
   
   def __str__(self):
     return f'Mode({self.isIn})'
@@ -129,25 +172,28 @@ class Param:
     self.type = type
 
   def __str__(self):
-    return f'record({self.ident}, {self.mode},{self.type})'
+    return f'Param({self.ident}, {self.mode},{self.type})'
   
 class Return:
   def __init__(self, expr):
     self.expr = expr
+  
+  def __str__(self):
+    return f"return({self.expr})"
 
-class Begin:
+class Block:
   def __init__(self, instr):
     self.instr = instr
-
-class Loop:
-  def __init__(self, instr):
-    self.instr = instr
+  def __str__(self):
+    return f"({self.instr})"
 
 class WhileLoop:
   def __init__(self,expr, instrList):
     self.expr = expr
     self.instrList = instrList
-
+  def __str__(self):
+    return f"while({self.expr}, {self.instrList})"
+  
 class ForLoop:
   def __init__(self, ident, isReverse, expr1, expr2, instrList):
     self.ident = ident
@@ -155,6 +201,10 @@ class ForLoop:
     self.expr1 = expr1
     self.expr2 = expr2
     self.instrList = instrList
+  def __str__(self):
+    if self.isReverse:
+      return f"for({self.ident}, reverse, {self.expr1}, {self.expr2}, {self.instrList})"
+    return f"for({self.ident}, {self.expr1}, {self.expr2}, {self.instrList})"
 
 class If:
   def __init__(self, expr1, instrList1, listTuple, instrList3):
@@ -162,8 +212,27 @@ class If:
     self.instrList1 = instrList1
     self.listTuple = listTuple
     self.instrList3 = instrList3
+  def __str__(self):
+    str = f"if({self.expr1}, ["
+    for instr in self.instrList1:
+      str += f"{instr},"
+    str += "]"
+    for elseif in self.listTuple:
+      str += ", elseif({elseif[0]}, ["
+      for instr in elseif[1]:
+        str += f"{instr},"
+      str += "])"
+    if self.instrList3:
+      str += ", else(["
+      for instr in self.instrList3:
+        str += f"{instr},"
+      str += "])"
+    return str + ')'
 
 class Affectation:
   def __init__(self, acess, expr):
     self.acess = acess
     self.expr = expr
+  def __str__(self):
+    return f":=({self.acess}, {self.expr})"
+    

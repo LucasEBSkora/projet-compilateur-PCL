@@ -3,6 +3,8 @@ from lexeur import Lexeur
 from analyseurExpr import AnalyseurExpr
 from analyseurInstr import AnalyseurInstr
 from analyseurFichier import AnalyseurFichier
+from ExceptionLexique import ExceptionLexique
+from ExceptionSyntatique import ExceptionSyntatique
 
 if len(argv) == 1:
   print("misssing source file!")
@@ -15,13 +17,22 @@ except ():
   exit(1)
 
 source_string = source.read()
+try:
+  lexeur = Lexeur(source_string)
+except ExceptionLexique as e:
+  print(str(e))
+  exit(-1)
 
-lexeur = Lexeur(source_string)
+# for token in lexeur.tokens:
+#   print(token)
 
 analyseurExpr = AnalyseurExpr(lexeur)
-AnalyseurInstr = AnalyseurInstr(lexeur, analyseurExpr)
-AnalyseurFichier = AnalyseurFichier(lexeur, AnalyseurInstr, analyseurExpr)
+analyseurInstr = AnalyseurInstr(lexeur, analyseurExpr)
+AnalyseurFichier = AnalyseurFichier(lexeur, analyseurInstr, analyseurExpr)
 
-AST = AnalyseurFichier.fichier()
-
-print(AST)
+try:
+  AST = AnalyseurFichier.fichier()
+  print(AST)
+except ExceptionSyntatique as e:
+  print(str(e))
+  exit(-1)

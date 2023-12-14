@@ -32,7 +32,7 @@ class AnalyseurInstr:
             instrList = self.repetitionInstr(typeToken.END)
             self.verification(typeToken.END)
             self.verification(typeToken.SEMICOLON)
-            return noeud.Begin(instrList)
+            return noeud.Block(instrList)
             
         # if <expr> then <instr>+ (elsif <expr> then <instr>+)*
         #        (else <instr>+)? end if ;

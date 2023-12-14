@@ -1,5 +1,6 @@
 import noeud
 from TypeToken import typeToken
+
 #parser fichier
 class AnalyseurFichier:
     
@@ -33,7 +34,7 @@ class AnalyseurFichier:
         if self.lexeur.peek().type != typeToken.EOF:
             return None
            
-        return noeud.Procedure(identificateur,NULL,instr,decl)
+        return noeud.Procedure(identificateur,None,instrs,decls)
     
     def decl(self):
          match self.lexeur.peek().type:
@@ -128,6 +129,7 @@ class AnalyseurFichier:
             idents.append(self.check_token(typeToken.IDENTIFICATEUR))
         self.check_token(typeToken.COLON)
         typage = self.typage()
+        expr = None
         if self.lexeur.peek().type == typeToken.AFFECT:
             self.check_token(typeToken.AFFECT)
             expr = self.analyseurExpr.expr()
@@ -171,18 +173,20 @@ class AnalyseurFichier:
         self.check_token(typeToken.RETURN)
         typage = self.typage()
         self.check_token(typeToken.IS)
-        decl = []
+        decls = []
         while self.lexeur.peek().type != typeToken.BEGIN:
-            decl = self.decl()
+            decls.append(self.decl())
         self.check_token(typeToken.BEGIN)
-        instr = self.analyseurInstr.instr()
+        instrs = [self.analyseurInstr.instr()]
+        while self.lexeur.peek().type != typeToken.END:
+            instrs.append(self.analyseurInstr.instr())
         self.check_token(typeToken.END)
         if self.lexeur.peek().type == typeToken.IDENTIFICATEUR:
             if identificateur != self.lexeur.peek().value: 
                 return None
         self.lexeur.next()
         self.check_token(typeToken.SEMICOLON)
-        return noeud.Function(identificateur,params,typage,instr,decl)
+        return noeud.Function(identificateur,params,typage,instrs,decls)
     
         
 
@@ -191,7 +195,7 @@ class AnalyseurFichier:
     def check_token(self, type, required = True):
         value = None
         if self.lexeur.peek().type != type and required:
-            raise ExceptionSyntatique(f"expected {type} instead of {self.lexeur.peek().value}", id.ligne, id.colomne)
+            raise ExceptionSyntatique(f"expected {type} instead of {self.lexeur.peek().value}", self.lexeur.peek().ligne, self.lexeur.peek().colomne)
           
         else:
             value = self.lexeur.peek().value

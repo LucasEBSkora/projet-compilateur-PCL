@@ -39,7 +39,7 @@ class Lexeur:
       '/': lambda : self._siSouvantSinon('=', typeToken.NE, typeToken.DIV),
       '<': lambda : self._siSouvantSinon('=', typeToken.LE, typeToken.LT),
       '>': lambda : self._siSouvantSinon('=', typeToken.GE, typeToken.GT),
-      '-': lambda : self._ajouterToken(typeToken.MINUS),
+      '-': lambda : self._verifierCommentaire(),
       '+': lambda : self._ajouterToken(typeToken.PLUS),
       '*': lambda : self._ajouterToken(typeToken.MUL),
       '.': lambda : self._siSouvantSinon('.', typeToken.DEUXPOINTS, typeToken.POINT),
@@ -70,17 +70,24 @@ class Lexeur:
     if self._prochainCaractere() == char:
       self._avancer()
       self._ajouterToken(si)
-    self._ajouterToken(sinon)
+    else:
+      self._ajouterToken(sinon)
 
   def _caractere(self):
     if self._finSource():
       raise ExceptionLexique("literal de caractere pas fini", self.ligneCourant, self.colomneCourant)
     char = self._avancer()
 
+    if char == '\\':
+      if self._prochainCaractereDans("0ntr\\"):
+        char += self._avancer()
+      else:
+        raise ExceptionLexique(f"caractère d'échappement invalide: \{self._prochainCaractere()}")
+
     if not self._match("'"):
       raise ExceptionLexique("literal de caractere pas fini", self.ligneCourant, self.colomneCourant)
 
-    if char not in string.printable:
+    if len(char) == 1 and char not in string.printable:
       raise ExceptionLexique(f"literal de caractere invalide: caractere ASCII {ord(char)}", self.ligneCourant, self.colomneCourant)
 
     self._ajouterToken(typeToken.CARACTERE)
@@ -100,14 +107,24 @@ class Lexeur:
     if prefixe == "Ada":
       if self._prochainCaracteresSont('.Text_IO'):
         self._ajouterToken(typeToken.ADA)
+        return
     elif prefixe == "character":
       if self._prochainCaracteresSont("'val"):
         self._ajouterToken(typeToken.CHARACTER_APOSTROFE_VAL)
+        return
     elif prefixe in mots_cles:
       self._ajouterToken(mots_cles[prefixe])
-    else:
-      self._ajouterToken(typeToken.IDENTIFICATEUR)
+      return
     
+    self._ajouterToken(typeToken.IDENTIFICATEUR)
+    
+  def _verifierCommentaire(self):
+    if not self._match('-'):
+      self._ajouterToken(typeToken.MINUS)
+      return
+    char = self.source[self.courant]
+    while not self._finSource() and self._avancer() != '\n':
+      pass
 
   def _prochainCaracteresSont(self, chars):
     courant = self.courant

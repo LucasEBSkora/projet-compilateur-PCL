@@ -27,12 +27,7 @@ class AnalyseurInstr:
         #begin <instr>+ end;
 
         if (self.prochainToken(typeToken.BEGIN)):
-            instrList = []
-            self.lexeur.next()
-            instrList = self.repetitionInstr(typeToken.END)
-            self.verification(typeToken.END)
-            self.verification(typeToken.SEMICOLON)
-            return noeud.Block(instrList)
+            return self.block()
             
         # if <expr> then <instr>+ (elsif <expr> then <instr>+)*
         #        (else <instr>+)? end if ;
@@ -133,8 +128,20 @@ class AnalyseurInstr:
         if(id == type):
             self.lexeur.next()
         else:
-            raise ExceptionSyntatique(f"Error: expected token type {type} but got {id}")
+            raise ExceptionSyntatique(f"Expected token type {type} but got {id}")
 
     def prochainToken(self, type):
         return self.lexeur.peek().type == type
+
+    def block(self, idOpt = None):
+        instrList = []
+        self.lexeur.next()
+        instrList = self.repetitionInstr(typeToken.END)
+        self.verification(typeToken.END)
+        if idOpt is not None and self.prochainToken(typeToken.IDENTIFICATEUR):
+            token = self.lexeur.next()
+            if token.value != idOpt:
+                raise ExceptionSyntatique(f"Expected the second identificateur to be the same as the first one, but they are differents. First Identificateur: {idOpt}. Second Identificateur: {token.value}", token.ligne, token.colomne)
+        self.verification(typeToken.SEMICOLON)
+        return noeud.Block(instrList)
     

@@ -8,6 +8,8 @@ from analyseurExpr import AnalyseurExpr
 from analyseurInstr import AnalyseurInstr
 from TypeToken import typeToken
 import noeud
+from ExceptionSyntatique import ExceptionSyntatique
+
 
 class TestAnalyseurInstr(unittest.TestCase):
 
@@ -64,6 +66,19 @@ class TestAnalyseurInstr(unittest.TestCase):
         self.assertIsInstance(result, noeud.Block)
         self.assertEqual(1, len(result.instr))
         self.assertEqual("5", result.instr[0].expr.literal)
+
+
+    def test_begin_with_identificateur(self):
+        lexer = FauxLexer.builder([(typeToken.BEGIN, "begin"),(typeToken.RETURN, "return"),(typeToken.ENTIER, "5") ,(typeToken.SEMICOLON, ";"), 
+                                   (typeToken.END, "end"), (typeToken.IDENTIFICATEUR, "x"), (typeToken.SEMICOLON, ";")])
+        expr = AnalyseurExpr(lexer)
+        analyseur = AnalyseurInstr(lexer, expr)
+        try:
+            analyseur.block("y")
+        except ExceptionSyntatique as e:
+            self.assertEqual(f"Expected the second identificateur to be the same as the first one, but they are differents. First Identificateur: y. Second Identificateur: x", e.message)
+            return
+        self.assertTrue(False)
 
     def test_while(self):
         lexer = FauxLexer.builder([(typeToken.WHILE, "while"),(typeToken.IDENTIFICATEUR, "a") ,(typeToken.LOOP, "loop"), (typeToken.RETURN, "return"),

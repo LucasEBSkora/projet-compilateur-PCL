@@ -1,18 +1,3 @@
-class Fichier:
-  def __init__(self,idents,decls,instrs):
-    self.idents = idents
-    self.decls = decls
-    self.instrs = instrs
-
-  def __str__(self):
-    str = f"procedure({self.idents}, ["
-    for decl in self.decls:
-      str += f", {decl}"
-    str += "], ["
-    for instr in self.instrs:
-      str += f", {instr}"
-    return str + "])"
-
 class Binaire:
   def __init__(self, gauche, operateur, droite):
     self.gauche = gauche
@@ -85,16 +70,16 @@ class Procedure:
     self.decl = decl
   
   def __str__(self):
-    str = f"procedure({self.idents}, ["
+    str = f"procedure({self.ident}, ["
     for param in self.params:
       str += f", {param}"
     str += "], ["
     
-    for decl in self.decls:
+    for decl in self.decl:
       str += f", {decl}"
     str += "], ["
 
-    for instr in self.instrs:
+    for instr in self.instr:
       str += f", {instr}"
     return str + "])"
 

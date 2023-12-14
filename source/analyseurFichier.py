@@ -34,7 +34,7 @@ class AnalyseurFichier:
         if self.lexeur.peek().type != typeToken.EOF:
             return None
            
-        return noeud.Procedure(identificateur,None,instrs,decls)
+        return noeud.Procedure(identificateur,[],instrs,decls)
     
     def decl(self):
          match self.lexeur.peek().type:

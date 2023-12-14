@@ -12,7 +12,7 @@ procedure unDebut is
     a := a * a;
     a := a / a;
     a := a rem a;
-    a := a = b
+    a := a = b;
     a := a < b;
     a := a > b;
     a := a <= b;

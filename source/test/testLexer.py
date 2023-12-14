@@ -67,6 +67,12 @@ class TestLexer(unittest.TestCase):
       with self.subTest(msg=str):
         self.creerObjetEtTesterUnSeuleToken(Token(typeToken.CARACTERE, str, 1, 1), str)
 
+  def test_identifieCharacteresDechappage(self):
+    for c in 'rtn0\\':
+      str = f"'\{c}'"
+      with self.subTest(msg=str):
+        self.creerObjetEtTesterUnSeuleToken(Token(typeToken.CARACTERE, str, 1, 1), str)
+
   def test_identifieChaqueIdentificateurUnSeuleCaractere(self):
     for c in string.ascii_letters:
       with self.subTest(msg=c):

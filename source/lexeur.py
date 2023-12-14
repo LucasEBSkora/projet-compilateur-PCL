@@ -78,10 +78,16 @@ class Lexeur:
       raise ExceptionLexique("literal de caractere pas fini", self.ligneCourant, self.colomneCourant)
     char = self._avancer()
 
+    if char == '\\':
+      if self._prochainCaractereDans("0ntr\\"):
+        char += self._avancer()
+      else:
+        raise ExceptionLexique(f"caractère d'échappement invalide: \{self._prochainCaractere()}")
+
     if not self._match("'"):
       raise ExceptionLexique("literal de caractere pas fini", self.ligneCourant, self.colomneCourant)
 
-    if char not in string.printable:
+    if len(char) == 1 and char not in string.printable:
       raise ExceptionLexique(f"literal de caractere invalide: caractere ASCII {ord(char)}", self.ligneCourant, self.colomneCourant)
 
     self._ajouterToken(typeToken.CARACTERE)

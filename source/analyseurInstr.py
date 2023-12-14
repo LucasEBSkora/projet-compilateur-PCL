@@ -1,6 +1,7 @@
 import noeud
 from TypeToken import typeToken
 from analyseurExpr import AnalyseurExpr
+from ExceptionSyntatique import ExceptionSyntatique
 
 #parser instr
 
@@ -132,8 +133,7 @@ class AnalyseurInstr:
         if(id == type):
             self.lexeur.next()
         else:
-            print(f"Error: expected token type {type} but got {id}")
-            exit(1)
+            raise ExceptionSyntatique(f"Error: expected token type {type} but got {id}")
 
     def prochainToken(self, type):
         return self.lexeur.peek().type == type

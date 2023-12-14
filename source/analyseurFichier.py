@@ -1,5 +1,6 @@
 import noeud
 from TypeToken import typeToken
+from ExceptionSyntatique import ExceptionSyntatique
 
 #parser fichier
 class AnalyseurFichier:
@@ -151,7 +152,10 @@ class AnalyseurFichier:
      
         self.check_token(typeToken.PROCEDURE)
         identificateur = self.check_token(typeToken.IDENTIFICATEUR)
-        params = self.params() 
+        if self.lexeur.peek().type == typeToken.PARENG:
+            params = self.params() 
+        else:
+            params = []
         self.check_token(typeToken.IS)
         decl = self.decl()
         self.check_token(typeToken.BEGIN)
@@ -169,7 +173,10 @@ class AnalyseurFichier:
      
         self.check_token(typeToken.FUNCTION)
         identificateur = self.check_token(typeToken.IDENTIFICATEUR)
-        params = self.params() 
+        if self.lexeur.peek().type == typeToken.PARENG:
+            params = self.params() 
+        else:
+            params = []
         self.check_token(typeToken.RETURN)
         typage = self.typage()
         self.check_token(typeToken.IS)

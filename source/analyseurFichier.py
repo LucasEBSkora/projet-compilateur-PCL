@@ -59,6 +59,7 @@ class AnalyseurFichier:
             idents.append(self.check_token(typeToken.IDENTIFICATEUR))
         self.check_token(typeToken.COLON)
         typage = self.typage()
+        self.check_token(typeToken.SEMICOLON)
         return noeud.Champs(idents,typage)
     
     def _type(self):
@@ -66,16 +67,18 @@ class AnalyseurFichier:
         identificateur = self.check_token(typeToken.IDENTIFICATEUR)
         if self.lexeur.peek().type == typeToken.SEMICOLON:
             self.check_token(typeToken.SEMICOLON)
-            return noeud.Type(identificateur)
+            return noeud.Type(False, identificateur)
         self.check_token(typeToken.IS)
         if self.lexeur.peek().type == typeToken.ACCESS:
             self.check_token(typeToken.ACCESS)
             identificateur_access = self.check_token(typeToken.IDENTIFICATEUR)
             self.check_token(typeToken.SEMICOLON)
-            return noeud.Access(identificateur, identificateur_access)
+            return noeud.AccessType(identificateur, identificateur_access)
         elif self.lexeur.peek().type == typeToken.RECORD:
             self.check_token(typeToken.RECORD)
-            champs = self.champs()
+            champs = [self.champs()]
+            while self.lexeur.peek().type == typeToken.IDENTIFICATEUR:
+                champs.append(self.champs())
             self.check_token(typeToken.END)
             self.check_token(typeToken.RECORD)
             self.check_token(typeToken.SEMICOLON)
@@ -86,7 +89,7 @@ class AnalyseurFichier:
     def params(self):
         params = []
         self.check_token(typeToken.PARENG)
-        params.append(self.param())
+        params.extend(self.param())
         while self.lexeur.peek().type == typeToken.SEMICOLON:
             self.check_token(typeToken.SEMICOLON)
             params.extend(self.param())
@@ -116,7 +119,7 @@ class AnalyseurFichier:
     def mode(self):
         isIn = True
         self.check_token(typeToken.IN)
-        if self.lexeur.peek() == typeToken.OUT:
+        if self.lexeur.peek().type == typeToken.OUT:
             self.check_token(typeToken.OUT)
             isIn = False
         return isIn
@@ -157,16 +160,20 @@ class AnalyseurFichier:
         else:
             params = []
         self.check_token(typeToken.IS)
-        decl = self.decl()
+        decl = []
+        while self.lexeur.peek().type != typeToken.BEGIN:
+            decl.append(self.decl())
         self.check_token(typeToken.BEGIN)
-        instr = self.analyseurInstr.instr()
+        instrs = [self.analyseurInstr.instr()]
+        while self.lexeur.peek().type != typeToken.END:
+            instrs.append(self.analyseurInstr.instr())
         self.check_token(typeToken.END)
         if self.lexeur.peek().type == typeToken.IDENTIFICATEUR:
             if identificateur != self.lexeur.peek().value: 
                 return None
             self.lexeur.next()
         self.check_token(typeToken.SEMICOLON)
-        return noeud.Procedure(identificateur,params,instr,decl)
+        return noeud.Procedure(identificateur,params,instrs,decl)
     
     def function(self):
         identificateur = None
@@ -191,7 +198,7 @@ class AnalyseurFichier:
         if self.lexeur.peek().type == typeToken.IDENTIFICATEUR:
             if identificateur != self.lexeur.peek().value: 
                 return None
-        self.lexeur.next()
+            self.lexeur.next()
         self.check_token(typeToken.SEMICOLON)
         return noeud.Function(identificateur,params,typage,instrs,decls)
     

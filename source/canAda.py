@@ -23,9 +23,6 @@ except ExceptionLexique as e:
   print(str(e))
   exit(-1)
 
-# for token in lexeur.tokens:
-#   print(token)
-
 analyseurExpr = AnalyseurExpr(lexeur)
 analyseurInstr = AnalyseurInstr(lexeur, analyseurExpr)
 AnalyseurFichier = AnalyseurFichier(lexeur, analyseurInstr, analyseurExpr)

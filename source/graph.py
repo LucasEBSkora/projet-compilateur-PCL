@@ -11,7 +11,7 @@ class TreeDrawer:
 
     def draw_tree(self, node, x, y, dx, dy):
         if isinstance(node, (nd.Binaire, nd.Unaire, nd.Literal, nd.Ident, nd.New, nd.CharacterApostrofeVal, nd.Appel,
-                             nd.Var, nd.Procedure, nd.Function, nd.Record, nd.Access, nd.Type, nd.Champs, nd.Mode, nd.Param,
+                             nd.Var, nd.Procedure, nd.Function, nd.Record, nd.AccessType, nd.Type, nd.Champs, nd.Mode, nd.Param,
                              nd.Return, nd.Block, nd.WhileLoop, nd.ForLoop, nd.If, nd.Affectation)):
             text = str(node)
         else:
@@ -20,7 +20,7 @@ class TreeDrawer:
         self.canvas.create_oval(x - 20, y - 20, x + 20, y + 20, outline="black")
         self.canvas.create_text(x, y, text=text)
 
-        if isinstance(node, (nd.Binaire, nd.Unaire, nd.Appel, nd.Var, nd.Procedure, nd.Function, nd.Record, nd.Access, nd.Type, nd.Champs, nd.Param, nd.Return)):
+        if isinstance(node, (nd.Binaire, nd.Unaire, nd.Appel, nd.Var, nd.Procedure, nd.Function, nd.Record, nd.AccessType, nd.Type, nd.Champs, nd.Param, nd.Return)):
             if hasattr(node, 'params'):
                 total_width = len(node.params) * dx
                 current_x = x - total_width / 2

@@ -109,13 +109,13 @@ class Record:
     str += f"])"
     return str    
 
-class Access:
+class AccessType:
   def __init__(self,ident1,ident2):
     self.ident1 = ident1
     self.ident2 = ident2
 
   def __str__(self):
-    return f'Access({self.ident1}, {self.ident2})'
+    return f'AccessType({self.ident1}, {self.ident2})'
 
 class Type:
   def __init__(self,isAccess,ident):

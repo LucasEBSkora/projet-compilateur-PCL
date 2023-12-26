@@ -44,11 +44,10 @@ class Appel:
     self.params = params
 
   def __str__(self):
-    str = f"appel({self.nom}"
-    for param in self.params:
-      str += f", {param}"
-    return str + ")"
-    
+    str = f"appel({self.nom}, "
+    str += _list_as_string(self.params)
+    str += ')'
+    return str
 
 class Var:
   def __init__(self,ident,type,expr):
@@ -71,16 +70,13 @@ class Procedure:
   
   def __str__(self):
     str = f"procedure({self.ident}, ["
-    for param in self.params:
-      str += f", {param}"
+    str += _list_as_string(self.params)
     str += "], ["
     
-    for decl in self.decl:
-      str += f", {decl}"
+    str += _list_as_string(self.decl)
     str += "], ["
 
-    for instr in self.instr:
-      str += f", {instr}"
+    str += _list_as_string(self.instr)
     return str + "])"
 
 class Function:
@@ -93,16 +89,13 @@ class Function:
 
   def __str__(self):
     str = f"function({self.ident}, ["
-    for param in self.params:
-      str += f", {param}"
+    str += _list_as_string(self.params)
     str += f"], {self.type}, ["
     
-    for decl in self.decls:
-      str += f", {decl}"
+    str += _list_as_string(self.decls)
     str += "], ["
 
-    for instr in self.instrs:
-      str += f", {instr}"
+    str += _list_as_string(self.instrs)
     return str + "])"
   
 class Record:
@@ -112,8 +105,7 @@ class Record:
 
   def __str__(self):
     str = f"Record({self.ident}, ["
-    for champ in self.champs:
-      str += f", {champ}"
+    str += _list_as_string(self.champs)
     str += f"])"
     return str    
 
@@ -170,14 +162,20 @@ class Block:
   def __init__(self, instr):
     self.instr = instr
   def __str__(self):
-    return f"({self.instr})"
+    str = '('
+    str += _list_as_string(self.instr)
+    str += ')'
+    return str
 
 class WhileLoop:
   def __init__(self,expr, instrList):
     self.expr = expr
     self.instrList = instrList
   def __str__(self):
-    return f"while({self.expr}, {self.instrList})"
+    str = f"while({self.expr}, ["
+    str += _list_as_string(self.instrList)
+    str += "])"
+    return str
   
 class ForLoop:
   def __init__(self, ident, isReverse, expr1, expr2, instrList):
@@ -187,9 +185,15 @@ class ForLoop:
     self.expr2 = expr2
     self.instrList = instrList
   def __str__(self):
+    str = f"for({self.ident}, "
+
     if self.isReverse:
-      return f"for({self.ident}, reverse, {self.expr1}, {self.expr2}, {self.instrList})"
-    return f"for({self.ident}, {self.expr1}, {self.expr2}, {self.instrList})"
+      str += "reverse, "
+    
+    str += f"{self.expr1}, {self.expr2}, ["
+    str += _list_as_string(self.instrList)
+    str += "])"
+    return str
 
 class If:
   def __init__(self, expr1, instrList1, listTuple, instrList3):
@@ -199,18 +203,15 @@ class If:
     self.instrList3 = instrList3
   def __str__(self):
     str = f"if({self.expr1}, ["
-    for instr in self.instrList1:
-      str += f"{instr},"
+    _list_as_string(self.instrList1)
     str += "]"
     for elseif in self.listTuple:
-      str += ", elseif({elseif[0]}, ["
-      for instr in elseif[1]:
-        str += f"{instr},"
+      str += f", elseif({elseif[0]}, ["
+      str += _list_as_string(elseif[1])
       str += "])"
     if self.instrList3:
       str += ", else(["
-      for instr in self.instrList3:
-        str += f"{instr},"
+      str += _list_as_string(self.instrList3)
       str += "])"
     return str + ')'
 
@@ -221,3 +222,11 @@ class Affectation:
   def __str__(self):
     return f":=({self.acess}, {self.expr})"
     
+
+def _list_as_string(list):
+  str = ""
+  if list:
+    str += f"{list[0]}"
+    for i in list[1:]:
+      str += f", {i}"
+  return str

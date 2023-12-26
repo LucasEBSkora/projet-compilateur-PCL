@@ -29,8 +29,6 @@ except ExceptionLexique as e:
 analyseurExpr = AnalyseurExpr(lexeur)
 analyseurInstr = AnalyseurInstr(lexeur, analyseurExpr)
 AnalyseurFichier = AnalyseurFichier(lexeur, analyseurInstr, analyseurExpr)
-AST = AnalyseurFichier.fichier()
-
 try:
   AST = AnalyseurFichier.fichier()
   print(AST)

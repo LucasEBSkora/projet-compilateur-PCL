@@ -63,6 +63,8 @@ class TestLexer(unittest.TestCase):
 
   def test_identifieChaqueCaractere(self):
     for c in string.printable:
+      if c == '\\': # le caractere \ doit être representé par le caractere d'échappage
+        continue 
       str = f"'{c}'"
       with self.subTest(msg=str):
         self.creerObjetEtTesterUnSeuleToken(Token(typeToken.CARACTERE, str, 1, 1), str)
@@ -215,6 +217,24 @@ class TestLexer(unittest.TestCase):
       lexer = Lexeur(text)
     except ExceptionLexique as e:
       self.assertEqual("literal de caractere invalide: caractere ASCII 1", e.message)
+      return
+    self.assertTrue(False)
+
+  def test_caractereInvalide(self):
+    text = "'\\'"
+    try:
+      lexer = Lexeur(text)
+    except ExceptionLexique as e:
+      self.assertEqual("'\\' n'est pas un caractère d'échappement valide: pour le caractere \\, utiliser '\\\\'", e.message)
+      return
+    self.assertTrue(False)
+
+  def test_caractereDechappageInvalide(self):
+    text = "'\\%'"
+    try:
+      lexer = Lexeur(text)
+    except ExceptionLexique as e:
+      self.assertEqual("caractère d'échappement invalide: \\%", e.message)
       return
     self.assertTrue(False)
 

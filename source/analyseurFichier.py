@@ -126,6 +126,7 @@ class AnalyseurFichier:
   
     def var(self):
         idents = []
+        vars = []
         typage = None
         idents += [self.check_token(typeToken.IDENTIFICATEUR)]
         while self.lexeur.peek().type == typeToken.COMMA:
@@ -138,7 +139,9 @@ class AnalyseurFichier:
             self.check_token(typeToken.AFFECT)
             expr = self.analyseurExpr.expr()
         self.check_token(typeToken.SEMICOLON)
-        return noeud.Var(idents,typage,expr)
+        for ident in idents:
+            vars.append(noeud.Var(ident,typage,expr))
+        return vars
 
     def typage(self):
         if self.lexeur.peek().type == typeToken.ACCESS:
@@ -161,10 +164,13 @@ class AnalyseurFichier:
             params = []
         self.check_token(typeToken.IS)
         decl = []
+       
         while self.lexeur.peek().type != typeToken.BEGIN:
             decl.append(self.decl())
+
+        
         self.check_token(typeToken.BEGIN)
-        instrs = [self.analyseurInstr.instr()]
+        instrs = []
         while self.lexeur.peek().type != typeToken.END:
             instrs.append(self.analyseurInstr.instr())
         self.check_token(typeToken.END)
@@ -173,6 +179,7 @@ class AnalyseurFichier:
                 return None
             self.lexeur.next()
         self.check_token(typeToken.SEMICOLON)
+        instrs = self.analyseurInstr.block(identificateur)
         return noeud.Procedure(identificateur,params,instrs,decl)
     
     def function(self):
@@ -191,7 +198,7 @@ class AnalyseurFichier:
         while self.lexeur.peek().type != typeToken.BEGIN:
             decls.append(self.decl())
         self.check_token(typeToken.BEGIN)
-        instrs = [self.analyseurInstr.instr()]
+        instrs = []
         while self.lexeur.peek().type != typeToken.END:
             instrs.append(self.analyseurInstr.instr())
         self.check_token(typeToken.END)
@@ -200,6 +207,7 @@ class AnalyseurFichier:
                 return None
             self.lexeur.next()
         self.check_token(typeToken.SEMICOLON)
+        instrs = self.analyseurInstr.block(identificateur)
         return noeud.Function(identificateur,params,typage,instrs,decls)
     
         

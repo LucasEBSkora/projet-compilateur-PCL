@@ -32,18 +32,18 @@
                 loop <instr>+ end loop ;
               | while <expr> loop <instr>+ end loop ;
 
-<expr> ::= <and> (or <_else> <expr>)?
+<expr> ::= <and> (or <_else> <expr>)*
 <_else> ::= ε
             | else
-<and> ::= <not> ((and <_then>) <and>)?
+<and> ::= <not> ((and <_then>) <and>)*
 <_then> ::= ε
             | then
 <not> ::= not <not>
       |  <egal>
-<egal> ::= <comparaison> (( = | \=) <comparaison>)?
-<comparaison> ::= <addition> (( > |  >= | < | <=) <addition>)?
-<addition> ::= <multiplication> ((+ | -) <addition>)?
-<multiplication> ::= <negation> ((* | \ | rem) <multiplication>)?
+<egal> ::= <comparaison> (( = | \=) <comparaison>)*
+<comparaison> ::= <addition> (( > |  >= | < | <=) <addition>)*
+<addition> ::= <multiplication> ((+ | -) <addition>)*
+<multiplication> ::= <negation> ((* | \ | rem) <multiplication>)*
 <negation> ::= - <negation>
             |  <accès>
 <accès>      ::= <primaire> <_accès>

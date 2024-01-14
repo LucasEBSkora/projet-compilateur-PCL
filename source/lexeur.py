@@ -64,7 +64,7 @@ class Lexeur:
       self._identifiantOuMotCle()
       return 
         
-    raise ExceptionLexique(f"caractere inattendu {char}", self.ligneDebut, self.colomneDebut)
+    self._raiseExceptionLexique(f"caractere inattendu {char}")
     
   def _siSouvantSinon(self, char, si, sinon):
     if self._prochainCaractere() == char:
@@ -75,20 +75,22 @@ class Lexeur:
 
   def _caractere(self):
     if self._finSource():
-      raise ExceptionLexique("literal de caractere pas fini", self.ligneCourant, self.colomneCourant)
+      self._raiseExceptionLexique("literal de caractere pas fini")
     char = self._avancer()
 
     if char == '\\':
       if self._prochainCaractereDans("0ntr\\"):
         char += self._avancer()
+      elif self._prochainCaractereEst("'"):
+        self._raiseExceptionLexique("'\\' n'est pas un caractère d'échappement valide: pour le caractere \\, utiliser '\\\\'")
       else:
-        raise ExceptionLexique(f"caractère d'échappement invalide: \{self._prochainCaractere()}")
+        self._raiseExceptionLexique(f"caractère d'échappement invalide: \\{self._prochainCaractere()}")
 
     if not self._match("'"):
-      raise ExceptionLexique("literal de caractere pas fini", self.ligneCourant, self.colomneCourant)
+      self._raiseExceptionLexique("literal de caractere pas fini")
 
     if len(char) == 1 and char not in string.printable:
-      raise ExceptionLexique(f"literal de caractere invalide: caractere ASCII {ord(char)}", self.ligneCourant, self.colomneCourant)
+      self._raiseExceptionLexique(f"literal de caractere invalide: caractere ASCII {ord(char)}")
 
     self._ajouterToken(typeToken.CARACTERE)
 
@@ -193,3 +195,6 @@ class Lexeur:
       valeur = self.peek()
       self.indice += 1
       return valeur
+  
+  def _raiseExceptionLexique(self, message):
+    raise ExceptionLexique(message, self.ligneCourant, self.colomneCourant)

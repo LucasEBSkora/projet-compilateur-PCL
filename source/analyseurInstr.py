@@ -137,7 +137,7 @@ class AnalyseurInstr:
         if(id == type):
             self.lexeur.next()
         else:
-            raise ExceptionSyntatique(f"Expected token type {type} but got {id}")
+            raise ExceptionSyntatique(f"Expected token type {type} but got {id}", self.lexeur.peek().ligne, self.lexeur.peek().colomne)
 
     def prochainToken(self, type):
         return self.lexeur.peek().type == type

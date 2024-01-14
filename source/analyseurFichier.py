@@ -31,7 +31,7 @@ class AnalyseurFichier:
         return noeud.Procedure(identificateur,[],instrs,decls)
     
     def decl(self):
-         match self.lexeur.peek().type:
+        match self.lexeur.peek().type:
             case typeToken.TYPE:
                 return self._type()
             case typeToken.IDENTIFICATEUR:

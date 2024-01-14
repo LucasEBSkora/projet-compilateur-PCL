@@ -12,7 +12,6 @@ from ExceptionSyntatique import ExceptionSyntatique
 
 
 class TestAnalyseurInstr(unittest.TestCase):
-
     def test_prochain_token(self):
         lexer = FauxLexer.builder([(typeToken.RETURN, "return"), (typeToken.SEMICOLON, ";")])
         expr = AnalyseurExpr(lexer)
@@ -27,6 +26,7 @@ class TestAnalyseurInstr(unittest.TestCase):
         instr.verification(typeToken.RETURN)
         self.assertIs(typeToken.SEMICOLON ,lexer.peek().type)
 
+
     def test_repetitionInstr(self):
         lexer = FauxLexer.builder([(typeToken.RETURN, "return"), (typeToken.SEMICOLON, ";"), (typeToken.RETURN, "return"),(typeToken.ENTIER, "10") ,
                                    (typeToken.SEMICOLON, ";"), (typeToken.RETURN, "return"),(typeToken.ENTIER, "5") ,(typeToken.SEMICOLON, ";"), 
@@ -40,7 +40,6 @@ class TestAnalyseurInstr(unittest.TestCase):
         self.assertEqual("5", lista[2].expr.literal)
 
 
-
     def test_return_without_expr(self):
         lexer = FauxLexer.builder([(typeToken.RETURN, "return"), (typeToken.SEMICOLON, ";")])
         expr = AnalyseurExpr(lexer)
@@ -49,6 +48,7 @@ class TestAnalyseurInstr(unittest.TestCase):
         self.assertIsInstance(result, noeud.Return)
         self.assertEqual(None, result.expr)
 
+
     def test_return_expr(self):
         lexer = FauxLexer.builder([(typeToken.RETURN, "return"),(typeToken.ENTIER, "5") ,(typeToken.SEMICOLON, ";")])
         expr = AnalyseurExpr(lexer)
@@ -56,6 +56,7 @@ class TestAnalyseurInstr(unittest.TestCase):
         result = analyseur.instr()
         self.assertIsInstance(result, noeud.Return)
         self.assertEqual("5", result.expr.literal)
+
 
     def test_begin_instr_end(self):
         lexer = FauxLexer.builder([(typeToken.BEGIN, "begin"),(typeToken.RETURN, "return"),(typeToken.ENTIER, "5") ,(typeToken.SEMICOLON, ";"), 
@@ -80,6 +81,7 @@ class TestAnalyseurInstr(unittest.TestCase):
             return
         self.assertTrue(False)
 
+
     def test_while(self):
         lexer = FauxLexer.builder([(typeToken.WHILE, "while"),(typeToken.IDENTIFICATEUR, "a") ,(typeToken.LOOP, "loop"), (typeToken.RETURN, "return"),
                                    (typeToken.ENTIER, "5") ,(typeToken.SEMICOLON, ";"), (typeToken.END, "end"), (typeToken.LOOP, "loop"), (typeToken.SEMICOLON, ";") ])
@@ -90,6 +92,7 @@ class TestAnalyseurInstr(unittest.TestCase):
         self.assertEqual(1, len(result.instrList))
         self.assertEqual("5", result.instrList[0].expr.literal)
         self.assertEqual("a", result.expr.nom)
+
 
     def test_for_without_reverse(self):
         lexer = FauxLexer.builder([(typeToken.FOR, "for"),(typeToken.IDENTIFICATEUR, "b"), (typeToken.IN, "in"), (typeToken.IDENTIFICATEUR, "a"),
@@ -126,8 +129,7 @@ class TestAnalyseurInstr(unittest.TestCase):
         self.assertEqual("5", result.instrList[0].expr.literal)
         self.assertEqual("7", result.instrList[1].expr.literal)
 
-
-
+    
     def test_if_without_elseif_and_else(self):
         lexer = FauxLexer.builder([(typeToken.IF, "if"), (typeToken.ENTIER, "5"), (typeToken.THEN, "then"), (typeToken.RETURN, "return"), 
                                    (typeToken.IDENTIFICATEUR, "a"), (typeToken.SEMICOLON, ";"), (typeToken.RETURN, "return"), (typeToken.IDENTIFICATEUR, "b"), 
@@ -136,12 +138,13 @@ class TestAnalyseurInstr(unittest.TestCase):
         analyseur = AnalyseurInstr(lexer, expr)
         result = analyseur.instr()
         self.assertIsInstance(result, noeud.If)
-        self.assertEqual("5" , result.expr1.literal)
-        self.assertEqual(2, len(result.instrList1))
-        self.assertEqual("a", result.instrList1[0].expr.nom)
-        self.assertEqual("b", result.instrList1[1].expr.nom)
-        self.assertEqual(0, len(result.listTuple))
-        self.assertEqual(0, len(result.instrList3))
+        self.assertEqual("5" , result.expr.literal)
+        self.assertIsInstance(result.instrNoeud, noeud.Block)
+        self.assertEqual(2, len(result.instrNoeud.instr))
+        self.assertEqual("a", result.instrNoeud.instr[0].expr.nom)
+        self.assertEqual("b", result.instrNoeud.instr[1].expr.nom)
+        self.assertEqual(result.elseNoeud, None)
+
 
     def test_if_without_elseif_and_avec_else(self):
         lexer = FauxLexer.builder([(typeToken.IF, "if"), (typeToken.ENTIER, "5"), (typeToken.THEN, "then"), (typeToken.RETURN, "return"), 
@@ -153,15 +156,16 @@ class TestAnalyseurInstr(unittest.TestCase):
         analyseur = AnalyseurInstr(lexer, expr)
         result = analyseur.instr()
         self.assertIsInstance(result, noeud.If)
-        self.assertEqual("5" , result.expr1.literal)
-        self.assertEqual(2, len(result.instrList1))
-        self.assertEqual("a", result.instrList1[0].expr.nom)
-        self.assertEqual("b", result.instrList1[1].expr.nom)
-        self.assertEqual(0, len(result.listTuple))
-        self.assertEqual(2, len(result.instrList3))
-        self.assertEqual("2", result.instrList3[0].expr.literal)
-        self.assertEqual("g", result.instrList3[1].expr.nom)
-
+        self.assertEqual("5" , result.expr.literal)
+        self.assertIsInstance(result.instrNoeud, noeud.Block)
+        self.assertEqual(2, len(result.instrNoeud.instr))
+        self.assertEqual("a", result.instrNoeud.instr[0].expr.nom)
+        self.assertEqual("b", result.instrNoeud.instr[1].expr.nom)
+        self.assertIsInstance(result.elseNoeud, noeud.Block)
+        self.assertEqual(2, len(result.elseNoeud.instr))
+        self.assertEqual("2", result.elseNoeud.instr[0].expr.literal)
+        self.assertEqual("g", result.elseNoeud.instr[1].expr.nom)    
+    
 
     def test_if_avec_elseif_and_without_else(self):
         lexer = FauxLexer.builder([(typeToken.IF, "if"), (typeToken.ENTIER, "5"), (typeToken.THEN, "then"), (typeToken.RETURN, "return"), 
@@ -175,18 +179,20 @@ class TestAnalyseurInstr(unittest.TestCase):
         analyseur = AnalyseurInstr(lexer, expr)
         result = analyseur.instr()
         self.assertIsInstance(result, noeud.If)
-        self.assertEqual("5" , result.expr1.literal)
-        self.assertEqual(2, len(result.instrList1))
-        self.assertEqual("a", result.instrList1[0].expr.nom)
-        self.assertEqual("b", result.instrList1[1].expr.nom)
-        self.assertEqual(2, len(result.listTuple))
-        self.assertEqual("c", result.listTuple[0][0].nom)
-        self.assertEqual("f", result.listTuple[1][0].nom)
-        self.assertEqual(None, result.listTuple[1][1][0].expr)
-        self.assertEqual("d", result.listTuple[0][1][0].expr.nom)
-        self.assertEqual("e", result.listTuple[0][1][1].expr.nom)
-        self.assertEqual(0, len(result.instrList3))
-
+        self.assertEqual("5" , result.expr.literal)
+        self.assertIsInstance(result.instrNoeud, noeud.Block)
+        self.assertEqual(2, len(result.instrNoeud.instr))
+        self.assertEqual("a", result.instrNoeud.instr[0].expr.nom)
+        self.assertEqual("b", result.instrNoeud.instr[1].expr.nom)
+        self.assertIsInstance(result.elseNoeud, noeud.If)
+        self.assertEqual(2, len(result.elseNoeud.instrNoeud.instr))
+        self.assertEqual("c", result.elseNoeud.expr.nom)
+        self.assertEqual("d", result.elseNoeud.instrNoeud.instr[0].expr.nom)
+        self.assertEqual("e", result.elseNoeud.instrNoeud.instr[1].expr.nom)
+        self.assertIsInstance(result.elseNoeud.elseNoeud, noeud.If)
+        self.assertEqual(1, len(result.elseNoeud.elseNoeud.instrNoeud.instr))
+        self.assertEqual("f", result.elseNoeud.elseNoeud.expr.nom)
+        self.assertEqual(None, result.elseNoeud.elseNoeud.instrNoeud.instr[0].expr)
 
 
     def test_if_avec_elseif_and_avec_else(self):
@@ -203,19 +209,25 @@ class TestAnalyseurInstr(unittest.TestCase):
         analyseur = AnalyseurInstr(lexer, expr)
         result = analyseur.instr()
         self.assertIsInstance(result, noeud.If)
-        self.assertEqual("5" , result.expr1.literal)
-        self.assertEqual(2, len(result.instrList1))
-        self.assertEqual("a", result.instrList1[0].expr.nom)
-        self.assertEqual("b", result.instrList1[1].expr.nom)
-        self.assertEqual(2, len(result.listTuple))
-        self.assertEqual("c", result.listTuple[0][0].nom)
-        self.assertEqual("f", result.listTuple[1][0].nom)
-        self.assertEqual(None, result.listTuple[1][1][0].expr)
-        self.assertEqual("d", result.listTuple[0][1][0].expr.nom)
-        self.assertEqual("e", result.listTuple[0][1][1].expr.nom)
-        self.assertEqual(2, len(result.instrList3))
-        self.assertEqual("2", result.instrList3[0].expr.literal)
-        self.assertEqual("g", result.instrList3[1].expr.nom)
+        self.assertEqual("5" , result.expr.literal)
+        self.assertIsInstance(result.instrNoeud, noeud.Block)
+        self.assertEqual(2, len(result.instrNoeud.instr))
+        self.assertEqual("a", result.instrNoeud.instr[0].expr.nom)
+        self.assertEqual("b", result.instrNoeud.instr[1].expr.nom)
+        self.assertIsInstance(result.elseNoeud, noeud.If)
+        self.assertEqual(2, len(result.elseNoeud.instrNoeud.instr))
+        self.assertEqual("c", result.elseNoeud.expr.nom)
+        self.assertEqual("d", result.elseNoeud.instrNoeud.instr[0].expr.nom)
+        self.assertEqual("e", result.elseNoeud.instrNoeud.instr[1].expr.nom)
+        self.assertIsInstance(result.elseNoeud.elseNoeud, noeud.If)
+        self.assertEqual(1, len(result.elseNoeud.elseNoeud.instrNoeud.instr))
+        self.assertEqual("f", result.elseNoeud.elseNoeud.expr.nom)
+        self.assertEqual(None, result.elseNoeud.elseNoeud.instrNoeud.instr[0].expr)
+        self.assertIsInstance(result.elseNoeud.elseNoeud.elseNoeud, noeud.Block)
+        self.assertEqual(2, len(result.elseNoeud.elseNoeud.elseNoeud.instr))
+        self.assertEqual("2", result.elseNoeud.elseNoeud.elseNoeud.instr[0].expr.literal)
+        self.assertEqual("g", result.elseNoeud.elseNoeud.elseNoeud.instr[1].expr.nom)
+
 
     def test_affectation(self):
         lexer = FauxLexer.builder([(typeToken.IDENTIFICATEUR, "a"),(typeToken.AFFECT, ":="), (typeToken.ENTIER, "5"), (typeToken.SEMICOLON, ";")])
@@ -223,13 +235,15 @@ class TestAnalyseurInstr(unittest.TestCase):
         analyseur = AnalyseurInstr(lexer, expr)
         result = analyseur.instr()
         self.assertIsInstance(result, noeud.Affectation)
-        
+
+
     def test_appel(self):
         lexer = FauxLexer.builder([(typeToken.IDENTIFICATEUR, "a"), (typeToken.PARENG, "("), (typeToken.PAREND, ")"), (typeToken.SEMICOLON, ";")])
         expr = AnalyseurExpr(lexer)
         analyseur = AnalyseurInstr(lexer, expr)
         result = analyseur.instr()
         self.assertIsInstance(result, noeud.Appel)
+
 
     def test_ident(self):
         lexer = FauxLexer.builder([(typeToken.IDENTIFICATEUR, "a"), (typeToken.SEMICOLON, ";")])
@@ -238,15 +252,13 @@ class TestAnalyseurInstr(unittest.TestCase):
         result = analyseur.instr()
         self.assertIsInstance(result, noeud.Ident)
 
+
     def test_ident_expr(self):
         lexer = FauxLexer.builder([(typeToken.IDENTIFICATEUR, "a"), (typeToken.AFFECT, ":="), (typeToken.ENTIER, "5"), (typeToken.SEMICOLON, ";")])
         expr = AnalyseurExpr(lexer)
         analyseur = AnalyseurInstr(lexer, expr)
         result = analyseur.instr()
         self.assertIsInstance(result, noeud.Affectation)
-
-
-
 
 
 if __name__ == '__main__':

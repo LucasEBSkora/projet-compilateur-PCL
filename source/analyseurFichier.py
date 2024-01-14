@@ -25,7 +25,8 @@ class AnalyseurFichier:
         instrs = self.analyseurInstr.block(identificateur)
 
         if self.lexeur.peek().type != typeToken.EOF:
-            return None
+            raise ExceptionSyntatique("Erreur de syntaxe dans la déclaration du fichier", self.lexeur.peek().ligne, self.lexeur.peek().colonne)
+
            
         return noeud.Procedure(identificateur,[],instrs,decls)
     
@@ -40,7 +41,7 @@ class AnalyseurFichier:
             case typeToken.FUNCTION:
                 return self.function()
             case _:
-                raise ExceptionSyntatique("Erreur de syntaxe dans la déclaration", self.lexeur.peek().ligne, self.lexeur.peek().colonne)
+                    raise ExceptionSyntatique("Erreur de syntaxe dans la déclaration ", self.lexeur.peek().ligne, self.lexeur.peek().colonne)
 
     
     def champs(self):

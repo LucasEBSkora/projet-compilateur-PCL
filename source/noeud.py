@@ -207,11 +207,11 @@ class ForLoop:
     return f"for({self.ident}, {self.expr1}, {self.expr2}, {self.instrList})"
 
 class If:
-  def __init__(self, expr1, instrList1, listTuple, instrList3):
-    self.expr1 = expr1
-    self.instrList1 = instrList1
-    self.listTuple = listTuple
-    self.instrList3 = instrList3
+  def __init__(self, expr, instrNoeud, elseNoeud):
+    self.expr = expr
+    self.instrNoeud = instrNoeud
+    self.elseNoeud = elseNoeud
+  """
   def __str__(self):
     str = f"if({self.expr1}, ["
     for instr in self.instrList1:
@@ -228,6 +228,7 @@ class If:
         str += f"{instr},"
       str += "])"
     return str + ')'
+  """
 
 class Affectation:
   def __init__(self, acess, expr):

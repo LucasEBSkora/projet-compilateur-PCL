@@ -38,9 +38,10 @@ class AnalyseurInstr:
             instrList4 = []
             listTuples = []
             self.lexeur.next()
-            x = self.analyseurExpr.expr()
+            expr = self.analyseurExpr.expr()
             self.verification(typeToken.THEN)
             instrList2 = self.repetitionInstr(typeToken.ELSEIF, typeToken.ELSE, typeToken.END)
+            noeudInstrIf = noeud.Block(instrList2)
             if(self.prochainToken(typeToken.ELSEIF)):
                 while(self.prochainToken(typeToken.ELSEIF)):
                     instrList3 = []
@@ -48,16 +49,24 @@ class AnalyseurInstr:
                     y = self.analyseurExpr.expr()
                     self.verification(typeToken.THEN)
                     instrList3 = self.repetitionInstr(typeToken.ELSE, typeToken.END, typeToken.ELSEIF)
-                    listTuples.append((y, instrList3))
+                    noeudInstrElseIf = noeud.Block(instrList3)
+                    listTuples.append((y, noeudInstrElseIf))
             else: y = None
             if(self.prochainToken(typeToken.ELSE)):
                 self.lexeur.next()
                 instrList4 = self.repetitionInstr(typeToken.END)
+                noeudInstrElse = noeud.Block(instrList4)
+            else:
+                noeudInstrElse = None
             if(self.prochainToken(typeToken.END)):
                 self.verification(typeToken.END)
                 self.verification(typeToken.IF)
                 self.verification(typeToken.SEMICOLON)
-            return noeud.If(x, instrList2, listTuples, instrList4)
+            if (not listTuples and noeudInstrElse is not None):
+                noeudFinal = noeudInstrElse
+            else:    
+                noeudFinal = self.createNoeudIf(list(reversed(listTuples)) , noeudInstrElse)
+            return noeud.If(expr, noeudInstrIf, noeudFinal)
 
         # | for <ident> in reverse? <expr> .. <expr>
         #   loop <instr>+ end loop ;
@@ -144,4 +153,11 @@ class AnalyseurInstr:
                 raise ExceptionSyntatique(f"Expected the second identificateur to be the same as the first one, but they are differents. First Identificateur: {idOpt}. Second Identificateur: {token.value}", token.ligne, token.colomne)
         self.verification(typeToken.SEMICOLON)
         return noeud.Block(instrList)
+    
+    def createNoeudIf(self ,listTuple , elseParameter):
+        if(len(listTuple) == 0):
+            return None
+        if len(listTuple) == 1:
+            return noeud.If(listTuple[0][0], listTuple[0][1], elseParameter)
+        return self.createNoeudIf(listTuple[1:], noeud.If(listTuple[0][0], listTuple[0][1], elseParameter))
     

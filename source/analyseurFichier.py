@@ -21,17 +21,9 @@ class AnalyseurFichier:
         while self.lexeur.peek().type != typeToken.BEGIN:
             decls.append(self.decl())
     
-        self.check_token(typeToken.BEGIN)
-        instrs = []
-        while self.lexeur.peek().type != typeToken.END:
-            instrs.append(self.analyseurInstr.instr())
-        
-        self.check_token(typeToken.END)
-        if self.lexeur.peek().type == typeToken.IDENTIFICATEUR:
-            if identificateur != self.lexeur.peek().value:
-                return None
-            self.lexeur.next()
-        self.check_token(typeToken.SEMICOLON)
+       
+        instrs = self.analyseurInstr.block(identificateur)
+
         if self.lexeur.peek().type != typeToken.EOF:
             return None
            
@@ -48,7 +40,8 @@ class AnalyseurFichier:
             case typeToken.FUNCTION:
                 return self.function()
             case _:
-                return None
+                raise ExceptionSyntatique("Erreur de syntaxe dans la déclaration", self.lexeur.peek().ligne, self.lexeur.peek().colonne)
+
     
     def champs(self):
         idents = []
@@ -83,7 +76,9 @@ class AnalyseurFichier:
             self.check_token(typeToken.RECORD)
             self.check_token(typeToken.SEMICOLON)
             return noeud.Record(identificateur, champs)
-        return None
+        
+        raise ExceptionSyntatique("Erreur de syntaxe dans la déclaration de type", self.lexeur.peek().ligne, self.lexeur.peek().colonne)
+
 
     
     def params(self):
@@ -118,10 +113,11 @@ class AnalyseurFichier:
     
     def mode(self):
         isIn = True
-        self.check_token(typeToken.IN)
-        if self.lexeur.peek().type == typeToken.OUT:
-            self.check_token(typeToken.OUT)
-            isIn = False
+        if self.lexeur.peek().type == typeToken.IN:
+            self.check_token(typeToken.IN)
+            if self.lexeur.peek().type == typeToken.OUT:
+                self.check_token(typeToken.OUT)
+                isIn = False
         return isIn
   
     def var(self):
@@ -168,17 +164,6 @@ class AnalyseurFichier:
         while self.lexeur.peek().type != typeToken.BEGIN:
             decl.append(self.decl())
 
-        
-        self.check_token(typeToken.BEGIN)
-        instrs = []
-        while self.lexeur.peek().type != typeToken.END:
-            instrs.append(self.analyseurInstr.instr())
-        self.check_token(typeToken.END)
-        if self.lexeur.peek().type == typeToken.IDENTIFICATEUR:
-            if identificateur != self.lexeur.peek().value: 
-                return None
-            self.lexeur.next()
-        self.check_token(typeToken.SEMICOLON)
         instrs = self.analyseurInstr.block(identificateur)
         return noeud.Procedure(identificateur,params,instrs,decl)
     
@@ -197,16 +182,9 @@ class AnalyseurFichier:
         decls = []
         while self.lexeur.peek().type != typeToken.BEGIN:
             decls.append(self.decl())
-        self.check_token(typeToken.BEGIN)
-        instrs = []
-        while self.lexeur.peek().type != typeToken.END:
-            instrs.append(self.analyseurInstr.instr())
-        self.check_token(typeToken.END)
-        if self.lexeur.peek().type == typeToken.IDENTIFICATEUR:
-            if identificateur != self.lexeur.peek().value: 
-                return None
-            self.lexeur.next()
-        self.check_token(typeToken.SEMICOLON)
+       
+     
+      
         instrs = self.analyseurInstr.block(identificateur)
         return noeud.Function(identificateur,params,typage,instrs,decls)
     

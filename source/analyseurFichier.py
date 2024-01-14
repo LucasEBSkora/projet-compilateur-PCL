@@ -31,17 +31,19 @@ class AnalyseurFichier:
         return noeud.Procedure(identificateur,[],instrs,decls)
     
     def decl(self):
-        match self.lexeur.peek().type:
-            case typeToken.TYPE:
-                return self._type()
-            case typeToken.IDENTIFICATEUR:
-                return self.var()
-            case typeToken.PROCEDURE:
-                return self.procedure()
-            case typeToken.FUNCTION:
-                return self.function()
-            case _:
-                raise ExceptionSyntatique("Erreur de syntaxe dans la déclaration ", self.lexeur.peek().ligne, self.lexeur.peek().colonne)
+       
+        token_type = self.lexeur.peek().type
+
+        if token_type == typeToken.TYPE:
+            return self._type()
+        elif token_type == typeToken.IDENTIFICATEUR:
+            return self.var()
+        elif token_type == typeToken.PROCEDURE:
+            return self.procedure()
+        elif token_type == typeToken.FUNCTION:
+            return self.function()
+        else:
+            raise ExceptionSyntaxique("Erreur de syntaxe dans la déclaration ", self.lexeur.peek().ligne, self.lexeur.peek().colonne)
 
     
     def champs(self):

@@ -41,7 +41,7 @@ class AnalyseurFichier:
             case typeToken.FUNCTION:
                 return self.function()
             case _:
-                    raise ExceptionSyntatique("Erreur de syntaxe dans la déclaration ", self.lexeur.peek().ligne, self.lexeur.peek().colonne)
+                raise ExceptionSyntatique("Erreur de syntaxe dans la déclaration ", self.lexeur.peek().ligne, self.lexeur.peek().colonne)
 
     
     def champs(self):

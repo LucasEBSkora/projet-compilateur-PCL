@@ -7,7 +7,7 @@ class TreeDrawer:
         self.tree = tree
         self.canvas = tk.Canvas(root, width=800, height=600)
         self.canvas.pack()
-        self.draw_tree(tree, 400, 50, 400, 50)
+        self.draw_tree(tree, 400, 50, 200, 50)
 
     def draw_tree(self, node, x, y, dx, dy):
         if isinstance(node, (nd.Binaire, nd.Unaire, nd.Literal, nd.Ident, nd.New, nd.CharacterApostrofeVal, nd.Appel,
@@ -17,7 +17,7 @@ class TreeDrawer:
         else:
             text = str(type(node).__name__)
 
-        self.canvas.create_oval(x - 20, y - 20, x + 20, y + 20, outline="black")
+        self.canvas.create_oval(x - 10, y - 10, x + 10, y + 10, outline="black")
         self.canvas.create_text(x, y, text=text)
 
         if isinstance(node, (nd.Binaire, nd.Unaire, nd.Appel, nd.Var, nd.Procedure, nd.Function, nd.Record, nd.AccessType, nd.Type, nd.Champs, nd.Param, nd.Return)):
@@ -26,42 +26,72 @@ class TreeDrawer:
                 current_x = x - total_width / 2
                 current_y = y + dy
                 for param in node.params:
-                    self.draw_tree(param, current_x + dx / 2, current_y + dy, dx, dy)
+                    child_x = current_x + dx / 2
+                    child_y = current_y + dy
+                    self.draw_tree(param, child_x, child_y, dx, dy)
+                    self.canvas.create_line(x, y + 10, child_x, child_y - 10, fill="black")
                     current_x += dx
             elif hasattr(node, 'expr'):
-                self.draw_tree(node.expr, x, y + dy, dx, dy)
+                child_x = x
+                child_y = y + dy
+                self.draw_tree(node.expr, child_x, child_y, dx, dy)
+                self.canvas.create_line(x, y + 10, child_x, child_y - 10, fill="black")
             elif hasattr(node, 'instr'):
-                self.draw_tree(node.instr, x, y + dy, dx, dy)
+                child_x = x
+                child_y = y + dy
+                self.draw_tree(node.instr, child_x, child_y, dx, dy)
+                self.canvas.create_line(x, y + 10, child_x, child_y - 10, fill="black")
             elif hasattr(node, 'instrList'):
-                current_x = x
+                total_width = len(node.instrList) * dx
+                current_x = x - total_width / 2
                 current_y = y + dy
                 for instr in node.instrList:
-                    self.draw_tree(instr, current_x, current_y, dx, dy)
-                    current_y += dy
+                    child_x = current_x + dx / 2
+                    child_y = current_y + dy
+                    self.draw_tree(instr, child_x, child_y, dx, dy)
+                    self.canvas.create_line(x, y + 10, child_x, child_y - 10, fill="black")
+                    current_x += dx
 
         elif isinstance(node, (nd.If)):
-            self.draw_tree(node.expr1, x, y + dy, dx, dy)
+            child_x = x
+            child_y = y + dy
+            self.draw_tree(node.expr1, child_x, child_y, dx, dy)
+            self.canvas.create_line(x, y + 10, child_x, child_y - 10, fill="black")
 
             current_x = x - dx
             current_y = y + 2 * dy
             for instr in node.instrList1:
-                self.draw_tree(instr, current_x, current_y, dx, dy)
-                current_y += dy
+                child_x = current_x + dx / 2
+                child_y = current_y + dy
+                self.draw_tree(instr, child_x, child_y, dx, dy)
+                self.canvas.create_line(x, y + 10, child_x, child_y - 10, fill="black")
+                current_x += dx
 
             for elseif in node.listTuple:
-                self.draw_tree(elseif[0], x, y + 2 * dy, dx, dy)
+                child_x = x
+                child_y = y + 2 * dy
+                self.draw_tree(elseif[0], child_x, child_y, dx, dy)
+                self.canvas.create_line(x, y + 10, child_x, child_y - 10, fill="black")
                 current_x = x - dx
                 current_y = y + 3 * dy
                 for instr in elseif[1]:
-                    self.draw_tree(instr, current_x, current_y, dx, dy)
-                    current_y += dy
+                    child_x = current_x + dx / 2
+                    child_y = current_y + dy
+                    self.draw_tree(instr, child_x, child_y, dx, dy)
+                    self.canvas.create_line(x, y + 10, child_x, child_y - 10, fill="black")
+                    current_x += dx
 
             if node.instrList3:
-                current_x = x - dx
-                current_y = y + 3 * dy
+                child_x = x
+                child_y = y + 3 * dy
                 for instr in node.instrList3:
-                    self.draw_tree(instr, current_x, current_y, dx, dy)
-                    current_y += dy
+                    child_x += dx / 2  # Mise à jour de current_x
+                    child_y = current_y + dy
+                    self.draw_tree(instr, child_x, child_y, dx, dy)
+                    self.canvas.create_line(x, y + 10, child_x, child_y - 10, fill="black")
+                    current_x += dx
 
     def run(self):
         self.root.mainloop()
+
+# Exemple d'utilisation avec un arbre fictif (remplacez-le par votre AST réel)

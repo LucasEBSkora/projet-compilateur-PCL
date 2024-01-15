@@ -5,9 +5,11 @@ from analyseurInstr import AnalyseurInstr
 from analyseurFichier import AnalyseurFichier
 from ExceptionLexique import ExceptionLexique
 from ExceptionSyntatique import ExceptionSyntatique
+from graph import TreeDrawer
+import tkinter as tk
 
 if len(argv) == 1:
-  print("misssing source file!")
+  print("missing source file!")
   exit(1)
 
 try:
@@ -28,6 +30,9 @@ analyseurInstr = AnalyseurInstr(lexeur, analyseurExpr)
 AnalyseurFichier = AnalyseurFichier(lexeur, analyseurInstr, analyseurExpr)
 try:
   AST = AnalyseurFichier.fichier()
+  root = tk.Tk()
+  tree_drawer = TreeDrawer(root, AST)
+  tree_drawer.run()
   print(AST)
 
 except ExceptionSyntatique as e:

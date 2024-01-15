@@ -17,9 +17,7 @@ class AnalyseurFichier:
             self.check_token(token)
         identificateur = self.check_token(typeToken.IDENTIFICATEUR)
         self.check_token(typeToken.IS)
-        decls = []
-        while self.lexeur.peek().type != typeToken.BEGIN:
-            decls.append(self.decl())
+        decls = self.decls()
     
        
         instrs = self.analyseurInstr.block(identificateur)
@@ -29,19 +27,24 @@ class AnalyseurFichier:
 
            
         return noeud.Procedure(identificateur,[],instrs,decls)
+    def decls(self):
+        decls = []
+        while self.lexeur.peek().type != typeToken.BEGIN:
+            decls.extend(self.decl())
+        return decls
     
     def decl(self):
        
         token_type = self.lexeur.peek().type
 
         if token_type == typeToken.TYPE:
-            return self._type()
+            return [self._type()]
         elif token_type == typeToken.IDENTIFICATEUR:
             return self.var()
         elif token_type == typeToken.PROCEDURE:
-            return self.procedure()
+            return [self.procedure()]
         elif token_type == typeToken.FUNCTION:
-            return self.function()
+            return [self.function()]
         else:
             raise ExceptionSyntatique("Erreur de syntaxe dans la déclaration ", self.lexeur.peek().ligne, self.lexeur.peek().colonne)
 
@@ -162,13 +165,10 @@ class AnalyseurFichier:
         else:
             params = []
         self.check_token(typeToken.IS)
-        decl = []
-       
-        while self.lexeur.peek().type != typeToken.BEGIN:
-            decl.append(self.decl())
+        decls = self.decls()
 
         instrs = self.analyseurInstr.block(identificateur)
-        return noeud.Procedure(identificateur,params,instrs,decl)
+        return noeud.Procedure(identificateur,params,instrs,decls)
     
     def function(self):
         identificateur = None
@@ -182,9 +182,7 @@ class AnalyseurFichier:
         self.check_token(typeToken.RETURN)
         typage = self.typage()
         self.check_token(typeToken.IS)
-        decls = []
-        while self.lexeur.peek().type != typeToken.BEGIN:
-            decls.append(self.decl())
+        decls = self.decls()
        
         instrs = self.analyseurInstr.block(identificateur)
         return noeud.Function(identificateur,params,typage,instrs,decls)

@@ -29,6 +29,7 @@ AnalyseurFichier = AnalyseurFichier(lexeur, analyseurInstr, analyseurExpr)
 try:
   AST = AnalyseurFichier.fichier()
   print(AST)
+
 except ExceptionSyntatique as e:
   print(str(e))
   exit(-1)

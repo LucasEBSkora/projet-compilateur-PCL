@@ -76,7 +76,7 @@ class Procedure:
     str += _list_as_string(self.decl)
     str += "], ["
 
-    str += _list_as_string(self.instr)
+    str += f"{self.instr}"
     return str + "])"
 
 class Function:
@@ -95,7 +95,7 @@ class Function:
     str += _list_as_string(self.decls)
     str += "], ["
 
-    str += _list_as_string(self.instrs)
+    str += f"{self.instrs}"
     return str + "])"
   
 class Record:
@@ -200,21 +200,12 @@ class If:
     self.expr = expr
     self.instrNoeud = instrNoeud
     self.elseNoeud = elseNoeud
-  """
   def __str__(self):
-    str = f"if({self.expr1}, ["
-    _list_as_string(self.instrList1)
-    str += "]"
-    for elseif in self.listTuple:
-      str += f", elseif({elseif[0]}, ["
-      str += _list_as_string(elseif[1])
-      str += "])"
-    if self.instrList3:
-      str += ", else(["
-      str += _list_as_string(self.instrList3)
-      str += "])"
-    return str + ')'
-  """
+    str = f"if({self.expr}, then [{self.instrNoeud}]"
+    if self.elseNoeud is not None:
+      str += f", else {self.elseNoeud}"
+    str += ")"
+    return str
 
 class Affectation:
   def __init__(self, acess, expr):

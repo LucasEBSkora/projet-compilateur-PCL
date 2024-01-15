@@ -25,7 +25,7 @@ procedure proc is
     return 2;
   end;
 
-  function make(p: in potato; c, l: in carrot) return stock is
+  function make(p: potato; c, l: in carrot) return stock is
     s: stock;
   begin
     s.p := p;

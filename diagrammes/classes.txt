@@ -10,6 +10,7 @@ class AnalyseurFichier {
 
 class AnalyseurInstr {
   instr(): Noeud
+  block(idOpt: String): Noeud
 }
 
 class AnalyseurExpr {
@@ -20,8 +21,8 @@ class AnalyseurExpr {
 
 class Token {
   ligne: int 
-  positionLigne: int
-  lexeme: String
+  colomne: int
+  valeur: String
   type: TypeToken
   toString() : String
 }

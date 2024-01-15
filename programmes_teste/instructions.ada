@@ -15,6 +15,9 @@ procedure unDebut is
       a := 21 + 3;
       func();
     end;
+    if caracter = 'c' then
+      put(caracter);
+    end if;
     if a > 20 then
       for b in 20 .. a loop
         put(b);

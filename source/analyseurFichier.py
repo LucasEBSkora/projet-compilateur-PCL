@@ -186,8 +186,6 @@ class AnalyseurFichier:
         while self.lexeur.peek().type != typeToken.BEGIN:
             decls.append(self.decl())
        
-     
-      
         instrs = self.analyseurInstr.block(identificateur)
         return noeud.Function(identificateur,params,typage,instrs,decls)
     

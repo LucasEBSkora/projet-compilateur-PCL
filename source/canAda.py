@@ -5,8 +5,17 @@ from analyseurInstr import AnalyseurInstr
 from analyseurFichier import AnalyseurFichier
 from ExceptionLexique import ExceptionLexique
 from ExceptionSyntatique import ExceptionSyntatique
-from graph import *
+#from graph import *
+from graph_test import *
+from anytree import RenderTree
+from graphviz import render
+from subprocess import run
+from anytree.exporter import DotExporter
+import os 
 
+
+os.environ["GRAPHIZ_DOT"] = '/Users/Diane/opt/anaconda3/lib/python3.9/site-packages/graphviz/dot.py'
+#mettez le chemin de votre executable dot.exec (download la librairie graphviz sur vos pc svp)
 if len(argv) == 1:
   print("missing source file!")
   exit(1)
@@ -29,13 +38,18 @@ analyseurInstr = AnalyseurInstr(lexeur, analyseurExpr)
 AnalyseurFichier = AnalyseurFichier(lexeur, analyseurInstr, analyseurExpr)
 try:
   AST = AnalyseurFichier.fichier()
-  # Construire l'arbre syntaxique en utilisant la fonction build_anytree
-  arbre_anytree = build_anytree(AST)
 
-# Affichage de l'arbre avec des traits
+   
+  arbre_anytree = build_anytree(AST)
   for pre, fill, node in RenderTree(arbre_anytree):
-    print(f"{pre}{node.name}")
-  print(AST)
+        print(f"{pre}{node.name}")
+
+
+  dot_data = DotExporter(arbre_anytree)
+  dot_data.to_dotfile("arbre_syntaxique.dot")
+
+  render('dot', 'png', 'arbre_syntaxique.dot')
+
 
 except ExceptionSyntatique as e:
   print(str(e))

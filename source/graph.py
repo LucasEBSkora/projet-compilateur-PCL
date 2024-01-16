@@ -1,97 +1,41 @@
-import tkinter as tk
-import noeud as nd
+from anytree import Node, RenderTree
+from noeud import *
 
-class TreeDrawer:
-    def __init__(self, root, tree):
-        self.root = root
-        self.tree = tree
-        self.canvas = tk.Canvas(root, width=800, height=600)
-        self.canvas.pack()
-        self.draw_tree(tree, 400, 50, 200, 50)
+class Binaire:
+    def __init__(self, gauche, operateur, droite):
+        self.gauche = gauche
+        self.operateur = operateur
+        self.droite = droite
 
-    def draw_tree(self, node, x, y, dx, dy):
-        if isinstance(node, (nd.Binaire, nd.Unaire, nd.Literal, nd.Ident, nd.New, nd.CharacterApostrofeVal, nd.Appel,
-                             nd.Var, nd.Procedure, nd.Function, nd.Record, nd.AccessType, nd.Type, nd.Champs, nd.Mode, nd.Param,
-                             nd.Return, nd.Block, nd.WhileLoop, nd.ForLoop, nd.If, nd.Affectation)):
-            text = str(node)
-        else:
-            text = str(type(node).__name__)
+    def __str__(self):
+        return f"{self.operateur}({self.gauche}, {self.droite})"
 
-        self.canvas.create_oval(x - 10, y - 10, x + 10, y + 10, outline="black")
-        self.canvas.create_text(x, y, text=text)
+class Unaire:
+    def __init__(self, operateur, operande):
+        self.operateur = operateur
+        self.operande = operande
 
-        if isinstance(node, (nd.Binaire, nd.Unaire, nd.Appel, nd.Var, nd.Procedure, nd.Function, nd.Record, nd.AccessType, nd.Type, nd.Champs, nd.Param, nd.Return)):
-            if hasattr(node, 'params'):
-                total_width = len(node.params) * dx
-                current_x = x - total_width / 2
-                current_y = y + dy
-                for param in node.params:
-                    child_x = current_x + dx / 2
-                    child_y = current_y + dy
-                    self.draw_tree(param, child_x, child_y, dx, dy)
-                    self.canvas.create_line(x, y + 10, child_x, child_y - 10, fill="black")
-                    current_x += dx
-            elif hasattr(node, 'expr'):
-                child_x = x
-                child_y = y + dy
-                self.draw_tree(node.expr, child_x, child_y, dx, dy)
-                self.canvas.create_line(x, y + 10, child_x, child_y - 10, fill="black")
-            elif hasattr(node, 'instr'):
-                child_x = x
-                child_y = y + dy
-                self.draw_tree(node.instr, child_x, child_y, dx, dy)
-                self.canvas.create_line(x, y + 10, child_x, child_y - 10, fill="black")
-            elif hasattr(node, 'instrList'):
-                total_width = len(node.instrList) * dx
-                current_x = x - total_width / 2
-                current_y = y + dy
-                for instr in node.instrList:
-                    child_x = current_x + dx / 2
-                    child_y = current_y + dy
-                    self.draw_tree(instr, child_x, child_y, dx, dy)
-                    self.canvas.create_line(x, y + 10, child_x, child_y - 10, fill="black")
-                    current_x += dx
+    def __str__(self):
+        return f"{self.operateur}({self.operande})"
 
-        elif isinstance(node, (nd.If)):
-            child_x = x
-            child_y = y + dy
-            self.draw_tree(node.expr1, child_x, child_y, dx, dy)
-            self.canvas.create_line(x, y + 10, child_x, child_y - 10, fill="black")
+# ... Ajoutez des nœuds pour d'autres classes de nœuds
 
-            current_x = x - dx
-            current_y = y + 2 * dy
-            for instr in node.instrList1:
-                child_x = current_x + dx / 2
-                child_y = current_y + dy
-                self.draw_tree(instr, child_x, child_y, dx, dy)
-                self.canvas.create_line(x, y + 10, child_x, child_y - 10, fill="black")
-                current_x += dx
+def build_anytree(node):
+    root = Node(str(node))
 
-            for elseif in node.listTuple:
-                child_x = x
-                child_y = y + 2 * dy
-                self.draw_tree(elseif[0], child_x, child_y, dx, dy)
-                self.canvas.create_line(x, y + 10, child_x, child_y - 10, fill="black")
-                current_x = x - dx
-                current_y = y + 3 * dy
-                for instr in elseif[1]:
-                    child_x = current_x + dx / 2
-                    child_y = current_y + dy
-                    self.draw_tree(instr, child_x, child_y, dx, dy)
-                    self.canvas.create_line(x, y + 10, child_x, child_y - 10, fill="black")
-                    current_x += dx
+    if isinstance(node, Binaire):
+        root.children = [build_anytree(node.gauche), build_anytree(node.droite)]
+    elif isinstance(node, Unaire):
+        root.children = [build_anytree(node.operande)]
+    # Ajoutez des conditions pour d'autres classes de nœuds
 
-            if node.instrList3:
-                child_x = x
-                child_y = y + 3 * dy
-                for instr in node.instrList3:
-                    child_x += dx / 2  # Mise à jour de current_x
-                    child_y = current_y + dy
-                    self.draw_tree(instr, child_x, child_y, dx, dy)
-                    self.canvas.create_line(x, y + 10, child_x, child_y - 10, fill="black")
-                    current_x += dx
+    return root
 
-    def run(self):
-        self.root.mainloop()
+# Utilisation avec un exemple de nœud
+exemple_noeud = Binaire(Ident("a"), "+", Literal(5))
+arbre_anytree = build_anytree(exemple_noeud)
 
-# Exemple d'utilisation avec un arbre fictif (remplacez-le par votre AST réel)
+# Affichage de l'arbre avec des traits
+for pre, fill, node in RenderTree(arbre_anytree):
+    print(f"{pre}{node.name}")
+

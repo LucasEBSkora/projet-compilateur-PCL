@@ -5,8 +5,7 @@ from analyseurInstr import AnalyseurInstr
 from analyseurFichier import AnalyseurFichier
 from ExceptionLexique import ExceptionLexique
 from ExceptionSyntatique import ExceptionSyntatique
-from graph import TreeDrawer
-import tkinter as tk
+from graph import *
 
 if len(argv) == 1:
   print("missing source file!")
@@ -30,9 +29,12 @@ analyseurInstr = AnalyseurInstr(lexeur, analyseurExpr)
 AnalyseurFichier = AnalyseurFichier(lexeur, analyseurInstr, analyseurExpr)
 try:
   AST = AnalyseurFichier.fichier()
-  root = tk.Tk()
-  tree_drawer = TreeDrawer(root, AST)
-  tree_drawer.run()
+  # Construire l'arbre syntaxique en utilisant la fonction build_anytree
+  arbre_anytree = build_anytree(AST)
+
+# Affichage de l'arbre avec des traits
+  for pre, fill, node in RenderTree(arbre_anytree):
+    print(f"{pre}{node.name}")
   print(AST)
 
 except ExceptionSyntatique as e:

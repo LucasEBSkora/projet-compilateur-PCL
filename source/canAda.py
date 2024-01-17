@@ -9,7 +9,7 @@ from graph import *
 from anytree import RenderTree
 from graphviz import render
 from subprocess import run
-from anytree.exporter import DotExporter
+from anytree.exporter import UniqueDotExporter
 import os 
 
 
@@ -35,21 +35,16 @@ except ExceptionLexique as e:
 analyseurExpr = AnalyseurExpr(lexeur)
 analyseurInstr = AnalyseurInstr(lexeur, analyseurExpr)
 AnalyseurFichier = AnalyseurFichier(lexeur, analyseurInstr, analyseurExpr)
+
 try:
   AST = AnalyseurFichier.fichier()
-
-   
-  arbre_anytree = build_anytree(AST)
-  for pre, fill, node in RenderTree(arbre_anytree):
-        print(f"{pre}{node.name}")
-
-
-  dot_data = DotExporter(arbre_anytree)
-  dot_data.to_dotfile("arbre_syntaxique.dot")
-
-  render('dot', 'png', 'arbre_syntaxique.dot')
-
 
 except ExceptionSyntatique as e:
   print(str(e))
   exit(-1)
+
+arbre_anytree = build_anytree(AST)
+# print(AST)
+# print(RenderTree(arbre_anytree))
+
+UniqueDotExporter(arbre_anytree).to_picture("arbre_syntaxique.png")

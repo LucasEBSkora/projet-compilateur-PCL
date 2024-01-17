@@ -13,8 +13,6 @@ from anytree.exporter import UniqueDotExporter
 import os 
 
 
-# os.environ["GRAPHIZ_DOT"] = '/Users/Diane/opt/anaconda3/lib/python3.9/site-packages/graphviz/dot.py'
-#mettez le chemin de votre executable dot.exec (download la librairie graphviz sur vos pc svp)
 if len(argv) == 1:
   print("missing source file!")
   exit(1)
@@ -45,6 +43,6 @@ except ExceptionSyntatique as e:
 
 arbre_anytree = build_anytree(AST)
 # print(AST)
-# print(RenderTree(arbre_anytree))
+print(RenderTree(arbre_anytree))
 
 UniqueDotExporter(arbre_anytree).to_picture("arbre_syntaxique.png")

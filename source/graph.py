@@ -36,9 +36,10 @@ def build_anytree(node, parent=None):
         current_node = create_node(f"procedure {node.ident}", parent)
         for param in node.params:
             build_anytree(param, current_node)
-        build_anytree(node.instr, current_node)
         for decl in node.decl:
             build_anytree(decl, current_node)
+        build_anytree(node.instr, current_node)
+
     elif isinstance(node, Function):
         current_node = create_node(f"function {node.ident}", parent)
         for param in node.params:

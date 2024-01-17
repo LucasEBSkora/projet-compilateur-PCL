@@ -59,7 +59,11 @@ class AnalyseurFichier:
         self.check_token(typeToken.COLON)
         typage = self.typage()
         self.check_token(typeToken.SEMICOLON)
-        return noeud.Champs(idents,typage)
+
+        champs = []
+        for ident in idents:
+            champs.append(noeud.Champs(ident,typage))
+        return champs
     
     def _type(self):
         self.check_token(typeToken.TYPE)
@@ -75,9 +79,9 @@ class AnalyseurFichier:
             return noeud.AccessType(identificateur, identificateur_access)
         elif self.lexeur.peek().type == typeToken.RECORD:
             self.check_token(typeToken.RECORD)
-            champs = [self.champs()]
+            champs = self.champs()
             while self.lexeur.peek().type == typeToken.IDENTIFICATEUR:
-                champs.append(self.champs())
+                champs.extend(self.champs())
             self.check_token(typeToken.END)
             self.check_token(typeToken.RECORD)
             self.check_token(typeToken.SEMICOLON)

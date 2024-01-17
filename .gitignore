@@ -1,2 +1,8 @@
 plantuml.jar
 **/__pycache__
+arbre_syntaxique.png
+bin
+include
+lib
+lib64
+pyvenv.cfg

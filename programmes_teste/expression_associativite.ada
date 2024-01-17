@@ -3,7 +3,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 procedure unDebut is
 
   a , b: integer;
-  type example is record c: integer end record;
+  type example is record c: integer; end record;
   d : example;
   
   begin

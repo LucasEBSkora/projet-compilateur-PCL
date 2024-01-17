@@ -135,13 +135,6 @@ class Champs:
   def __str__(self):
     return f'Champs({self.ident}, {self.type})'
 
-class Mode:
-  def __init__(self,isIn):
-    self.isIn = isIn
-  
-  def __str__(self):
-    return f'Mode({self.isIn})'
-
 class Param:
   def __init__(self,ident,mode,type):
     self.ident = ident

@@ -5,8 +5,7 @@ from analyseurInstr import AnalyseurInstr
 from analyseurFichier import AnalyseurFichier
 from ExceptionLexique import ExceptionLexique
 from ExceptionSyntatique import ExceptionSyntatique
-#from graph import *
-from graph_test import *
+from graph import *
 from anytree import RenderTree
 from graphviz import render
 from subprocess import run
@@ -14,7 +13,7 @@ from anytree.exporter import DotExporter
 import os 
 
 
-os.environ["GRAPHIZ_DOT"] = '/Users/Diane/opt/anaconda3/lib/python3.9/site-packages/graphviz/dot.py'
+# os.environ["GRAPHIZ_DOT"] = '/Users/Diane/opt/anaconda3/lib/python3.9/site-packages/graphviz/dot.py'
 #mettez le chemin de votre executable dot.exec (download la librairie graphviz sur vos pc svp)
 if len(argv) == 1:
   print("missing source file!")

@@ -10,7 +10,7 @@ procedure unDebut is
   end aireRectangle;
 
   function perimetreRectangle(larg: integer; long: integer) return integer is
-  p := integer; -- erreur 2
+  p : integer; 
   begin
     p := larg*2 + long*2;
     return p;
@@ -24,7 +24,7 @@ procedure unDebut is
   begin
     choix := 2;
 
-    if choix := 1 -- erreur 3
+    if choix = 1 
       then valeur := perimetreRectangle(2, 3);
         put(valeur)
       else valeur := aireRectangle(2, 3);

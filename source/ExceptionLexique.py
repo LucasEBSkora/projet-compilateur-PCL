@@ -6,4 +6,4 @@ class ExceptionLexique(BaseException):
     self.colomne = colomne
   
   def __str__(self):
-    return f"Erreur lexique {self.message} ({self.ligne}:{self.colomne})"
+    return f"Erreur lexique ({self.ligne}:{self.colomne}) {self.message}"
